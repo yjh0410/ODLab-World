@@ -43,8 +43,8 @@ class CustomedDataset(Dataset):
         if is_train:
             self.mosaic_prob = cfg.mosaic_prob
             self.mixup_prob  = cfg.mixup_prob
-            self.mosaic_augment = MosaicAugment(cfg.train_img_size, cfg.affine_params, is_train)
-            self.mixup_augment  = MixupAugment(cfg.train_img_size)
+            self.mosaic_augment = None if cfg.mosaic_prob == 0. else MosaicAugment(cfg.train_img_size, cfg.affine_params, is_train)
+            self.mixup_augment  = None if cfg.mixup_prob == 0.  else MixupAugment(cfg.train_img_size)
         else:
             self.mosaic_prob = 0.0
             self.mixup_prob  = 0.0
