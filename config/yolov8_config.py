@@ -131,6 +131,16 @@ class YOLOv8nConfig(YOLOv8BaseConfig):
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.0
+        self.affine_params = {
+            'degrees': 0.0,
+            'translate': 0.1,
+            'scale': [0.5, 1.5],
+            'shear': 0.0,
+            'perspective': 0.0,
+            'hsv_h': 0.015,
+            'hsv_s': 0.7,
+            'hsv_v': 0.4,
+        }
 
 # YOLOv8-S
 class YOLOv8sConfig(YOLOv8BaseConfig):
