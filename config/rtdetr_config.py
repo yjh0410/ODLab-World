@@ -109,7 +109,13 @@ class RTDetrBaseConfig(object):
 class RTDetrR18Config(RTDetrBaseConfig):
     def __init__(self) -> None:
         super().__init__()
-        pass
+        ## Backbone
+        self.backbone        = 'resnet18'
+        self.backbone_norm   = 'BN'
+        self.pretrained_weight  = 'imagenet1k_v1'
+        self.pretrained = True
+        self.freeze_at = -1
+        self.freeze_stem_only = False
 
 # RT-DETR-R50
 class RTDetrR50Config(RTDetrBaseConfig):
