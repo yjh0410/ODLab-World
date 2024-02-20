@@ -2,9 +2,9 @@ import torch
 import torch.nn as nn
 
 try:
-    from .yolov8_basic import Conv, Yolov8StageBlock
+    from .yolov8_basic import BasicConv, ELANLayer
 except:
-    from yolov8_basic import Conv, Yolov8StageBlock
+    from  yolov8_basic import BasicConv, ELANLayer
 
 
 # ---------------------------- Basic functions ----------------------------
@@ -21,16 +21,16 @@ class Yolov8Backbone(nn.Module):
         
         # ------------------ Network setting ------------------
         ## P1/2
-        self.layer_1 = Conv(3, self.feat_dims[0],
-                            k=3, p=1, s=2,
-                              act_type=cfg.bk_act, norm_type=cfg.bk_norm, depthwise=cfg.bk_depthwise)
+        self.layer_1 = BasicConv(3, self.feat_dims[0],
+                                 kernel_size=3, padding=1, stride=2,
+                                 act_type=cfg.bk_act, norm_type=cfg.bk_norm, depthwise=cfg.bk_depthwise)
         # P2/4
         self.layer_2 = nn.Sequential(
-            Conv(self.feat_dims[0], self.feat_dims[1],
-                 k=3, p=1, s=2,
+            BasicConv(self.feat_dims[0], self.feat_dims[1],
+                      kernel_size=3, padding=1, s=2,
                       act_type=cfg.bk_act, norm_type=cfg.bk_norm, depthwise=cfg.bk_depthwise),
-            Yolov8StageBlock(in_dim     = self.feat_dims[1],
-                             out_dim    = self.feat_dims[1],
+            ELANLayer(in_dim     = self.feat_dims[1],
+                      out_dim    = self.feat_dims[1],
                       num_blocks   = round(3*cfg.depth),
                       shortcut     = True,
                       act_type     = cfg.bk_act,
@@ -39,11 +39,11 @@ class Yolov8Backbone(nn.Module):
         )
         # P3/8
         self.layer_3 = nn.Sequential(
-            Conv(self.feat_dims[1], self.feat_dims[2],
-                 k=3, p=1, s=2,
+            BasicConv(self.feat_dims[1], self.feat_dims[2],
+                      kernel_size=3, padding=1, s=2,
                       act_type=cfg.bk_act, norm_type=cfg.bk_norm, depthwise=cfg.bk_depthwise),
-            Yolov8StageBlock(in_dim     = self.feat_dims[2],
-                             out_dim    = self.feat_dims[2],
+            ELANLayer(in_dim     = self.feat_dims[2],
+                      out_dim    = self.feat_dims[2],
                       num_blocks   = round(6*cfg.depth),
                       shortcut     = True,
                       act_type     = cfg.bk_act,
@@ -52,11 +52,11 @@ class Yolov8Backbone(nn.Module):
         )
         # P4/16
         self.layer_4 = nn.Sequential(
-            Conv(self.feat_dims[2], self.feat_dims[3],
-                 k=3, p=1, s=2,
+            BasicConv(self.feat_dims[2], self.feat_dims[3],
+                      kernel_size=3, padding=1, s=2,
                       act_type=cfg.bk_act, norm_type=cfg.bk_norm, depthwise=cfg.bk_depthwise),
-            Yolov8StageBlock(in_dim     = self.feat_dims[3],
-                             out_dim    = self.feat_dims[3],
+            ELANLayer(in_dim     = self.feat_dims[3],
+                      out_dim    = self.feat_dims[3],
                       num_blocks   = round(6*cfg.depth),
                       shortcut     = True,
                       act_type     = cfg.bk_act,
@@ -65,11 +65,11 @@ class Yolov8Backbone(nn.Module):
         )
         # P5/32
         self.layer_5 = nn.Sequential(
-            Conv(self.feat_dims[3], self.feat_dims[4],
-                 k=3, p=1, s=2,
+            BasicConv(self.feat_dims[3], self.feat_dims[4],
+                      kernel_size=3, padding=1, s=2,
                       act_type=cfg.bk_act, norm_type=cfg.bk_norm, depthwise=cfg.bk_depthwise),
-            Yolov8StageBlock(in_dim     = self.feat_dims[4],
-                             out_dim    = self.feat_dims[4],
+            ELANLayer(in_dim     = self.feat_dims[4],
+                      out_dim    = self.feat_dims[4],
                       num_blocks   = round(3*cfg.depth),
                       shortcut     = True,
                       act_type     = cfg.bk_act,

@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from .yolov8_basic import Conv
+from .yolov8_basic import BasicConv
 
 
 # Spatial Pyramid Pooling - Fast (SPPF) layer for YOLOv5 by Glenn Jocher
@@ -13,8 +13,8 @@ class SPPF(nn.Module):
         super().__init__()
         inter_dim = round(in_dim * cfg.neck_expand_ratio)
         self.out_dim = out_dim
-        self.cv1 = Conv(in_dim, inter_dim, k=1, act_type=cfg.neck_act, norm_type=cfg.neck_norm)
-        self.cv2 = Conv(inter_dim * 4, out_dim, k=1, act_type=cfg.neck_act, norm_type=cfg.neck_norm)
+        self.cv1 = BasicConv(in_dim, inter_dim, kernel_size=1, act_type=cfg.neck_act, norm_type=cfg.neck_norm)
+        self.cv2 = BasicConv(inter_dim * 4, out_dim, kernel_size=1, act_type=cfg.neck_act, norm_type=cfg.neck_norm)
         self.m = nn.MaxPool2d(kernel_size=cfg.spp_pooling_size, stride=1, padding=cfg.spp_pooling_size // 2)
 
     def forward(self, x):

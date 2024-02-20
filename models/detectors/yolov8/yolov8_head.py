@@ -1,10 +1,7 @@
 import torch
 import torch.nn as nn
 
-try:
-    from .yolov8_basic import Conv
-except:
-    from yolov8_basic import Conv
+from .yolov8_basic import BasicConv
 
 
 # Single-level Head
@@ -34,36 +31,40 @@ class SingleLevelHead(nn.Module):
         for i in range(num_cls_head):
             if i == 0:
                 cls_feats.append(
-                    Conv(in_dim, self.cls_head_dim, k=3, p=1, s=1, 
-                         act_type=act_type,
-                         norm_type=norm_type,
-                         depthwise=depthwise)
-                        )
+                    BasicConv(in_dim, self.cls_head_dim,
+                              kernel_size=3, padding=1, stride=1, 
+                              act_type=act_type,
+                              norm_type=norm_type,
+                              depthwise=depthwise)
+                              )
             else:
                 cls_feats.append(
-                    Conv(self.cls_head_dim, self.cls_head_dim, k=3, p=1, s=1, 
-                        act_type=act_type,
-                        norm_type=norm_type,
-                        depthwise=depthwise)
-                        )      
+                    BasicConv(self.cls_head_dim, self.cls_head_dim, k=3, p=1, s=1, 
+                              kernel_size=3, padding=1, stride=1, 
+                              act_type=act_type,
+                              norm_type=norm_type,
+                              depthwise=depthwise)
+                              )
         ## reg head
         reg_feats = []
         self.reg_head_dim = reg_head_dim
         for i in range(num_reg_head):
             if i == 0:
                 reg_feats.append(
-                    Conv(in_dim, self.reg_head_dim, k=3, p=1, s=1, 
-                         act_type=act_type,
-                         norm_type=norm_type,
-                         depthwise=depthwise)
-                        )
+                    BasicConv(in_dim, self.reg_head_dim,
+                              kernel_size=3, padding=1, stride=1, 
+                              act_type=act_type,
+                              norm_type=norm_type,
+                              depthwise=depthwise)
+                              )
             else:
                 reg_feats.append(
-                    Conv(self.reg_head_dim, self.reg_head_dim, k=3, p=1, s=1, 
-                         act_type=act_type,
-                         norm_type=norm_type,
-                         depthwise=depthwise)
-                        )
+                    BasicConv(self.reg_head_dim, self.reg_head_dim, k=3, p=1, s=1, 
+                              kernel_size=3, padding=1, stride=1, 
+                              act_type=act_type,
+                              norm_type=norm_type,
+                              depthwise=depthwise)
+                              )
         self.cls_feats = nn.Sequential(*cls_feats)
         self.reg_feats = nn.Sequential(*reg_feats)
 
