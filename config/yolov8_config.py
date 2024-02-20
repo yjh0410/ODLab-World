@@ -107,7 +107,6 @@ class YOLOv8BaseConfig(object):
         ## Transforms
         self.train_img_size = 640
         self.test_img_size  = 640
-        self.random_size    = [320, 352, 384, 416, 448, 480, 512, 544, 576, 608, 640, 672, 704, 736, 768, 800]
         self.use_ablu = True
         self.affine_params = {
             'degrees': 0.0,
