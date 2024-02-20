@@ -129,7 +129,7 @@ class YoloTrainer(object):
                 self.eval(model_eval)
             else:
                 model_eval = model.module if self.args.distributed else model
-                if (epoch % self.args.eval_epoch) == 0 or (epoch == self.cfg.max_epoch - 1):
+                if (epoch % self.cfg.eval_epoch) == 0 or (epoch == self.cfg.max_epoch - 1):
                     self.eval(model_eval)
 
             if self.args.debug:
@@ -425,7 +425,7 @@ class RTDetrTrainer(object):
                 self.eval(model_eval)
             else:
                 model_eval = model.module if self.args.distributed else model
-                if (epoch % self.args.eval_epoch) == 0 or (epoch == self.cfg.max_epoch - 1):
+                if (epoch % self.cfg.eval_epoch) == 0 or (epoch == self.cfg.max_epoch - 1):
                     self.eval(model_eval)
 
             if self.args.debug:
