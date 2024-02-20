@@ -389,7 +389,6 @@ class Normalize(object):
             img_h, img_w = image.shape[:2]
             target["boxes"][..., [0, 2]] = target["boxes"][..., [0, 2]] / float(img_w)
             target["boxes"][..., [1, 3]] = target["boxes"][..., [1, 3]] / float(img_h)
-            print(target['boxes'], img_w, img_h)
 
         return image, target
 

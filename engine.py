@@ -48,8 +48,8 @@ class YoloTrainer(object):
         # weak augmentatino stage
         self.second_stage = False
         self.third_stage  = False
-        self.second_stage_epoch = args.no_aug_epoch
-        self.third_stage_epoch  = args.no_aug_epoch // 2
+        self.second_stage_epoch = cfg.no_aug_epoch
+        self.third_stage_epoch  = cfg.no_aug_epoch // 2
         # path to save model
         self.path_to_save = os.path.join(args.save_folder, args.dataset, args.model)
         os.makedirs(self.path_to_save, exist_ok=True)
@@ -376,11 +376,6 @@ class RTDetrTrainer(object):
         self.device = device
         self.criterion = criterion
         self.heavy_eval = False
-        # weak augmentatino stage
-        self.second_stage = False
-        self.third_stage  = False
-        self.second_stage_epoch = args.no_aug_epoch
-        self.third_stage_epoch  = args.no_aug_epoch // 2
         # path to save model
         self.path_to_save = os.path.join(args.save_folder, args.dataset, args.model)
         os.makedirs(self.path_to_save, exist_ok=True)

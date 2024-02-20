@@ -41,8 +41,6 @@ def parse_args():
                         help='use cuda.')
     
     # Image size
-    parser.add_argument('-size', '--img_size', default=640, type=int, 
-                        help='input image size')
     parser.add_argument('--eval_first', action='store_true', default=False,
                         help='evaluate model before training.')
     
@@ -63,16 +61,6 @@ def parse_args():
     # Batchsize
     parser.add_argument('-bs', '--batch_size', default=16, type=int, 
                         help='batch size on all the GPUs.')
-
-    # Epoch
-    parser.add_argument('--max_epoch', default=150, type=int, 
-                        help='max epoch.')
-    parser.add_argument('--wp_epoch', default=1, type=int, 
-                        help='warmup epoch.')
-    parser.add_argument('--eval_epoch', default=10, type=int, 
-                        help='after eval epoch, the model is evaluated on val dataset.')
-    parser.add_argument('--no_aug_epoch', default=20, type=int, 
-                        help='cancel strong augmentation.')
 
     # Model
     parser.add_argument('-m', '--model', default='yolov8_n', type=str,
@@ -174,7 +162,7 @@ def train():
         model_copy.trainable = False
         model_copy.eval()
         compute_flops(model=model_copy,
-                      img_size=args.img_size,
+                      img_size=cfg.test_img_size,
                       device=device)
         del model_copy
     if args.distributed:
