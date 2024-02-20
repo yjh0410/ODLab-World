@@ -60,8 +60,10 @@ class ResNet(nn.Module):
                     pretrained_weights = pretrained_urls[name].IMAGENET1K_V2
         else:
             pretrained_weights = None
-        print('ImageNet pretrained weight: ', pretrained_weights)
+        print('- Backbone pretrained weight: ', pretrained_weights)
+
         # Norm layer
+        print("- Norm layer of backbone: {}".format(norm_type))
         if norm_type == 'BN':
             norm_layer = nn.BatchNorm2d
         elif norm_type == 'FrozeBN':
@@ -72,6 +74,7 @@ class ResNet(nn.Module):
         self.body = IntermediateLayerGetter(backbone, return_layers=return_layers)
         self.feat_dims = [128, 256, 512] if name in ('resnet18', 'resnet34') else [512, 1024, 2048]
         # Freeze
+        print("- Freeze at: {}".format(freeze_at))
         if freeze_at >= 0:
             for name, parameter in backbone.named_parameters():
                 if freeze_stem_only:
