@@ -21,7 +21,6 @@ if [ $WORLD_SIZE == 1 ]; then
             --root ${DATASET_ROOT} \
             --model ${MODEL} \
             --batch_size ${BATCH_SIZE} \
-            --img_size ${IMAGE_SIZE} \
             --resume ${RESUME} \
             --fp16 \
             --find_unused_parameters ${FIND_UNUSED_PARAMS}
@@ -33,7 +32,6 @@ elif [[ $WORLD_SIZE -gt 1 && $WORLD_SIZE -le 8 ]]; then
             --root ${DATASET_ROOT} \
             --model ${MODEL} \
             --batch_size ${BATCH_SIZE} \
-            --img_size ${IMAGE_SIZE} \
             --resume ${RESUME} \
             --fp16 \
             --find_unused_parameters ${FIND_UNUSED_PARAMS} \
