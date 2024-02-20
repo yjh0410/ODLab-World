@@ -236,29 +236,18 @@ if __name__ == "__main__":
             # ---------------- Data process config ----------------
             self.box_format = 'xywh'
             self.normalize_coords = False
-            self.mosaic_prob = 1.0
-            self.mixup_prob  = 0.15
+            self.mosaic_prob = 0.0
+            self.mixup_prob  = 0.0
             ## Pixel mean & std
             self.pixel_mean = [0., 0., 0.]
             self.pixel_std  = [255., 255., 255.]
             ## Transforms
             self.train_img_size = 640
             self.test_img_size  = 640
-            self.random_crop_size = [320, 352, 384, 416, 448, 480, 512, 544, 576, 608, 640, 672, 704, 736, 768, 800]
-            self.use_ablu = True
             self.aug_type = 'rtdetr'
-            self.affine_params = {
-                'degrees': 0.0,
-                'translate': 0.2,
-                'scale': [0.1, 2.0],
-                'shear': 0.0,
-                'perspective': 0.0,
-                'hsv_h': 0.015,
-                'hsv_s': 0.7,
-                'hsv_v': 0.4,
-            }
 
-    cfg = YoloBaseConfig()
+
+    cfg = RTDetrBaseConfig()
     transform = build_transform(cfg, args.is_train)
     dataset = VOCDataset(cfg, args.root, [('2007', 'test')], transform, args.is_train)
     

@@ -53,65 +53,116 @@ class ConvertColorFormat(object):
 
         return image, target
 
-## Random Photometric Distort
-class RandomPhotometricDistort(object):
-    """
-    Distort image w.r.t hue, saturation and exposure.
-    """
-
-    def __init__(self, hue=0.1, saturation=1.5, exposure=1.5):
-        super().__init__()
+## Random color jitter
+class RandomDistort(object):
+    def __init__(self,
+                 hue=[-18, 18, 0.5],
+                 saturation=[0.5, 1.5, 0.5],
+                 contrast=[0.5, 1.5, 0.5],
+                 brightness=[0.5, 1.5, 0.5],
+                 random_apply=True,
+                 count=4,
+                 random_channel=False,
+                 prob=1.0):
+        super(RandomDistort, self).__init__()
         self.hue = hue
         self.saturation = saturation
-        self.exposure = exposure
+        self.contrast = contrast
+        self.brightness = brightness
+        self.random_apply = random_apply
+        self.count = count
+        self.random_channel = random_channel
+        self.prob = prob
 
-    def __call__(self, image: np.ndarray, target=None) -> np.ndarray:
-        """
-        Args:
-            img (ndarray): of shape HxW, HxWxC, or NxHxWxC. The array can be
-                of type uint8 in range [0, 255], or floating point in range
-                [0, 1] or [0, 255].
+    def apply_hue(self, image, target=None):
+        if np.random.uniform(0., 1.) < self.prob:
+            return image, target
 
-        Returns:
-            ndarray: the distorted image(s).
-        """
-        if random.random() < 0.5:
-            dhue = np.random.uniform(low=-self.hue, high=self.hue)
-            dsat = self._rand_scale(self.saturation)
-            dexp = self._rand_scale(self.exposure)
-
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-            image = np.asarray(image, dtype=np.float32) / 255.
-            image[:, :, 1] *= dsat
-            image[:, :, 2] *= dexp
-            H = image[:, :, 0] + dhue * 179 / 255.
-
-            if dhue > 0:
-                H[H > 1.0] -= 1.0
-            else:
-                H[H < 0.0] += 1.0
-
-            image[:, :, 0] = H
-            image = (image * 255).clip(0, 255).astype(np.uint8)
-            image = cv2.cvtColor(image, cv2.COLOR_HSV2BGR)
-            image = np.asarray(image, dtype=np.uint8)
+        low, high, prob = self.hue
+        image = image.astype(np.float32)
+        # it works, but result differ from HSV version
+        delta = np.random.uniform(low, high)
+        u = np.cos(delta * np.pi)
+        w = np.sin(delta * np.pi)
+        bt = np.array([[1.0, 0.0, 0.0], [0.0, u, -w], [0.0, w, u]])
+        tyiq = np.array([[0.299, 0.587, 0.114], [0.596, -0.274, -0.321],
+                         [0.211, -0.523, 0.311]])
+        ityiq = np.array([[1.0, 0.956, 0.621], [1.0, -0.272, -0.647],
+                          [1.0, -1.107, 1.705]])
+        t = np.dot(np.dot(ityiq, bt), tyiq).T
+        image = np.dot(image, t)
 
         return image, target
 
-    def _rand_scale(self, upper_bound):
-        """
-        Calculate random scaling factor.
+    def apply_saturation(self, image, target=None):
+        low, high, prob = self.saturation
+        if np.random.uniform(0., 1.) < self.prob:
+            return image, target
+        delta = np.random.uniform(low, high)
+        image = image.astype(np.float32)
+        # it works, but result differ from HSV version
+        gray = image * np.array([[[0.299, 0.587, 0.114]]], dtype=np.float32)
+        gray = gray.sum(axis=2, keepdims=True)
+        gray *= (1.0 - delta)
+        image *= delta
+        image += gray
 
-        Args:
-            upper_bound (float): range of the random scale.
-        Returns:
-            random scaling factor (float) whose range is
-            from 1 / s to s .
-        """
-        scale = np.random.uniform(low=1, high=upper_bound)
-        if np.random.rand() > 0.5:
-            return scale
-        return 1 / scale
+        return image, target
+
+    def apply_contrast(self, image, target=None):
+        if np.random.uniform(0., 1.) < self.prob:
+            return image, target
+        
+        low, high, prob = self.contrast
+        delta = np.random.uniform(low, high)
+        image = image.astype(np.float32)
+        image *= delta
+
+        return image, target
+
+    def apply_brightness(self, image, target=None):
+        if np.random.uniform(0., 1.) < self.prob:
+            return image, target
+        
+        low, high, prob = self.brightness
+        delta = np.random.uniform(low, high)
+        image = image.astype(np.float32)
+        image += delta
+
+        return image, target
+
+    def __call__(self, image, target=None):
+        if random.random() > self.prob:
+            return image, target
+
+        if self.random_apply:
+            functions = [
+                self.apply_brightness, self.apply_contrast,
+                self.apply_saturation, self.apply_hue
+            ]
+            distortions = np.random.permutation(functions)[:self.count]
+            for func in distortions:
+                image, target = func(image, target)
+
+            return image, target
+
+        image, target = self.apply_brightness(image, target)
+        mode = np.random.randint(0, 2)
+
+        if mode:
+            image, target = self.apply_contrast(image, target)
+
+        image, target = self.apply_saturation(image, target)
+        image, target = self.apply_hue(image, target)
+
+        if not mode:
+            image, target = self.apply_contrast(image, target)
+
+        if self.random_channel:
+            if np.random.randint(0, 2):
+                image = image[..., np.random.permutation(3)]
+
+        return image, target
 
 ## Random scaling
 class RandomExpand(object):
@@ -142,19 +193,16 @@ class RandomExpand(object):
         return image, target
 
 ## Random IoU based Sample Crop
-class RandomSampleCrop(object):
-    def __init__(self):
+class RandomIoUCrop(object):
+    def __init__(self, p=0.5):
+        self.p = p
         self.sample_options = (
-            # using entire original input image
-            None,
             # sample a patch s.t. MIN jaccard w/ obj in .1,.3,.4,.7,.9
             (0.1, None),
             (0.3, None),
             (0.5, None),
             (0.7, None),
             (0.9, None),
-            # randomly sample a patch
-            (None, None),
         )
 
     def intersect(self, box_a, box_b):
@@ -177,7 +225,7 @@ class RandomSampleCrop(object):
         height, width, _ = image.shape
 
         # check target
-        if len(target["boxes"]) == 0:
+        if len(target["boxes"]) == 0 or random.random() > self.p:
             return image, target
 
         while True:
@@ -439,7 +487,7 @@ class RTDetrAugmentation(object):
         # ----------------- Basic parameters -----------------
         self.img_size = img_size
         self.box_format = box_format
-        self.pixel_mean = pixel_mean  # RGB format
+        self.pixel_mean = pixel_mean   # RGB format
         self.pixel_std  = pixel_std    # RGB format
         self.normalize_coords = normalize_coords
         self.color_format = 'rgb'
@@ -449,8 +497,9 @@ class RTDetrAugmentation(object):
 
         # ----------------- Transforms -----------------
         self.augment = Compose([
-            RandomPhotometricDistort(hue=0.5, saturation=1.5, exposure=1.5),
-            RandomJitterCrop(p=0.8, jitter_ratio=0.3, fill_value=self.pixel_mean[::-1]),
+            RandomDistort(prob=0.8),
+            RandomExpand(fill_value=self.pixel_mean[::-1]),
+            RandomIoUCrop(p=0.8),
             RandomHorizontalFlip(p=0.5),
             Resize(img_size=self.img_size),
             ConvertColorFormat(self.color_format),

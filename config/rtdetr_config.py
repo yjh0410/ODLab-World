@@ -97,10 +97,10 @@ class RTDetrBaseConfig(object):
         self.normalize_coords = True
         self.mosaic_prob = 0.0
         self.mixup_prob  = 0.0
-        self.multi_scale = [0.5, 1.25]
+        self.multi_scale = [0.75, 1.25]
         ## Pixel mean & std
-        self.pixel_mean = [123.675, 116.28, 103.53]
-        self.pixel_std  = [58.395, 57.12, 57.375]
+        self.pixel_mean = [123.675, 116.28, 103.53]   # RGB format
+        self.pixel_std  = [58.395, 57.12, 57.375]     # RGB format
         ## Transforms
         self.train_img_size = 640
         self.test_img_size  = 640
