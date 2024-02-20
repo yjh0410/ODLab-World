@@ -68,11 +68,13 @@ class ResNet(nn.Module):
             norm_layer = nn.BatchNorm2d
         elif norm_type == 'FrozeBN':
             norm_layer = FrozenBatchNorm2d
+
         # Backbone
         backbone = getattr(torchvision.models, name)(norm_layer=norm_layer, weights=pretrained_weights)
         return_layers = {"layer2": "0", "layer3": "1", "layer4": "2"}
         self.body = IntermediateLayerGetter(backbone, return_layers=return_layers)
         self.feat_dims = [128, 256, 512] if name in ('resnet18', 'resnet34') else [512, 1024, 2048]
+        
         # Freeze
         print("- Freeze at: {}".format(freeze_at))
         if freeze_at >= 0:
