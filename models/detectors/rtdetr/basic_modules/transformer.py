@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .basic import FFN
+from .mlp import FFN
 
 
 def get_clones(module, N):

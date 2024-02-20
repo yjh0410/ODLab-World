@@ -1,14 +1,10 @@
 import torch
 import torch.nn as nn
 
-try:
-    from .basic_modules.basic import multiclass_nms
-    from .rtdetr_encoder import ImageEncoder
-    from .rtdetr_decoder import RTDETRTransformer
-except:
-    from  basic_modules.basic import multiclass_nms
-    from  rtdetr_encoder import build_image_encoder
-    from  rtdetr_decoder import build_transformer
+from .rtdetr_encoder import ImageEncoder
+from .rtdetr_decoder import RTDETRTransformer
+
+from .basic_modules.nms_ops import multiclass_nms
 
 
 # Real-time DETR

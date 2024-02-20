@@ -9,14 +9,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-try:
-    from .loss_utils import box_cxcywh_to_xyxy, box_iou, generalized_box_iou
-    from .loss_utils import is_dist_avail_and_initialized, get_world_size
-    from .matcher import HungarianMatcher
-except:
-    from loss_utils import box_cxcywh_to_xyxy, box_iou, generalized_box_iou
-    from loss_utils import is_dist_avail_and_initialized, get_world_size
-    from matcher import HungarianMatcher
+from .loss_utils import box_cxcywh_to_xyxy, box_iou, generalized_box_iou
+from .loss_utils import is_dist_avail_and_initialized, get_world_size
+from .matcher import HungarianMatcher
 
 
 # --------------- Criterion for RT-DETR ---------------

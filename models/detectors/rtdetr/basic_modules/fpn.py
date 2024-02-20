@@ -3,12 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from typing import List
 
-try:
-    from .basic import BasicConv, RTCBlock
-    from .transformer import TransformerEncoder
-except:
-    from  basic import BasicConv, RTCBlock
-    from  transformer import TransformerEncoder
+from .conv import BasicConv, RTCBlock
+from .transformer import TransformerEncoder
 
 
 # Build PaFPN
@@ -161,39 +157,3 @@ class HybridEncoder(nn.Module):
         out_feats = [p3, p4, p5]
         
         return out_feats
-
-
-if __name__ == '__main__':
-    import time
-    from thop import profile
-    cfg = {
-        'fpn': 'hybrid_encoder',
-        'fpn_act': 'silu',
-        'fpn_norm': 'BN',
-        'fpn_depthwise': False,
-        'fpn_num_blocks': 3,
-        'fpn_expansion': 0.5,
-        'en_num_heads': 8,
-        'en_num_layers': 1,
-        'en_ffn_dim': 1024,
-        'en_dropout': 0.0,
-        'pe_temperature': 10000.,
-        'en_act': 'gelu',
-    }
-    fpn_dims = [256, 512, 1024]
-    out_dim = 256
-    pyramid_feats = [torch.randn(1, fpn_dims[0], 80, 80), torch.randn(1, fpn_dims[1], 40, 40), torch.randn(1, fpn_dims[2], 20, 20)]
-    model = build_fpn(cfg, fpn_dims, out_dim)
-
-    t0 = time.time()
-    outputs = model(pyramid_feats)
-    t1 = time.time()
-    print('Time: ', t1 - t0)
-    for out in outputs:
-        print(out.shape)
-
-    print('==============================')
-    flops, params = profile(model, inputs=(pyramid_feats, ), verbose=False)
-    print('==============================')
-    print('GFLOPs : {:.2f}'.format(flops / 1e9 * 2))
-    print('Params : {:.2f} M'.format(params / 1e6))

@@ -4,36 +4,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 from typing import List
 
-try:
-    from .basic_modules.basic import BasicConv, MLP
-    from .basic_modules.transformer import DeformableTransformerDecoder
-    from .basic_modules.dn_compoments import get_contrastive_denoising_training_group
-except:
-    from  basic_modules.basic import BasicConv, MLP
-    from  basic_modules.transformer import DeformableTransformerDecoder
-    from  basic_modules.dn_compoments import get_contrastive_denoising_training_group
-
-
-def build_transformer(cfg, in_dims, num_classes, return_intermediate=False):
-    if cfg.transformer == 'rtdetr_transformer':
-        return RTDETRTransformer(in_dims             = in_dims,
-                                 hidden_dim          = cfg.hidden_dim,
-                                 strides             = cfg.out_stride,
-                                 num_classes         = num_classes,
-                                 num_queries         = cfg.num_queries,
-                                 num_heads           = cfg.de_num_heads,
-                                 num_layers          = cfg.de_num_layers,
-                                 num_levels          = len(cfg.out_stride),
-                                 num_points          = cfg.de_num_points,
-                                 ffn_dim             = cfg.de_ffn_dim,
-                                 dropout             = cfg.de_dropout,
-                                 act_type            = cfg.de_act,
-                                 return_intermediate = return_intermediate,
-                                 num_denoising       = cfg.dn_num_denoising,
-                                 label_noise_ratio   = cfg.dn_label_noise_ratio,
-                                 box_noise_scale     = cfg.dn_box_noise_scale,
-                                 learnt_init_query   = cfg.learnt_init_query,
-                                 )
+from .basic_modules.conv import BasicConv
+from .basic_modules.mlp  import MLP
+from .basic_modules.transformer import DeformableTransformerDecoder
+from .basic_modules.dn_compoments import get_contrastive_denoising_training_group
 
 
 # ----------------- Dencoder for Detection task -----------------

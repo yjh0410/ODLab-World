@@ -3,10 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from scipy.optimize import linear_sum_assignment
 
-try:
-    from .loss_utils import box_cxcywh_to_xyxy, generalized_box_iou
-except:
-    from  loss_utils import box_cxcywh_to_xyxy, generalized_box_iou
+from .loss_utils import box_cxcywh_to_xyxy, generalized_box_iou
 
 
 class HungarianMatcher(nn.Module):

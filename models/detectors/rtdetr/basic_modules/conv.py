@@ -1,111 +1,6 @@
-import numpy as np
-import copy
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
-
-# ---------------------------- NMS ----------------------------
-## basic NMS
-def nms(bboxes, scores, nms_thresh):
-    """"Pure Python NMS."""
-    x1 = bboxes[:, 0]  #xmin
-    y1 = bboxes[:, 1]  #ymin
-    x2 = bboxes[:, 2]  #xmax
-    y2 = bboxes[:, 3]  #ymax
-
-    areas = (x2 - x1) * (y2 - y1)
-    order = scores.argsort()[::-1]
-
-    keep = []
-    while order.size > 0:
-        i = order[0]
-        keep.append(i)
-        # compute iou
-        xx1 = np.maximum(x1[i], x1[order[1:]])
-        yy1 = np.maximum(y1[i], y1[order[1:]])
-        xx2 = np.minimum(x2[i], x2[order[1:]])
-        yy2 = np.minimum(y2[i], y2[order[1:]])
-
-        w = np.maximum(1e-10, xx2 - xx1)
-        h = np.maximum(1e-10, yy2 - yy1)
-        inter = w * h
-
-        iou = inter / (areas[i] + areas[order[1:]] - inter + 1e-14)
-        #reserve all the boundingbox whose ovr less than thresh
-        inds = np.where(iou <= nms_thresh)[0]
-        order = order[inds + 1]
-
-    return keep
-
-## class-agnostic NMS 
-def multiclass_nms_class_agnostic(scores, labels, bboxes, nms_thresh):
-    # nms
-    keep = nms(bboxes, scores, nms_thresh)
-    scores = scores[keep]
-    labels = labels[keep]
-    bboxes = bboxes[keep]
-
-    return scores, labels, bboxes
-
-## class-aware NMS 
-def multiclass_nms_class_aware(scores, labels, bboxes, nms_thresh, num_classes):
-    # nms
-    keep = np.zeros(len(bboxes), dtype=np.int32)
-    for i in range(num_classes):
-        inds = np.where(labels == i)[0]
-        if len(inds) == 0:
-            continue
-        c_bboxes = bboxes[inds]
-        c_scores = scores[inds]
-        c_keep = nms(c_bboxes, c_scores, nms_thresh)
-        keep[inds[c_keep]] = 1
-    keep = np.where(keep > 0)
-    scores = scores[keep]
-    labels = labels[keep]
-    bboxes = bboxes[keep]
-
-    return scores, labels, bboxes
-
-## multi-class NMS 
-def multiclass_nms(scores, labels, bboxes, nms_thresh, num_classes, class_agnostic=False):
-    if class_agnostic:
-        return multiclass_nms_class_agnostic(scores, labels, bboxes, nms_thresh)
-    else:
-        return multiclass_nms_class_aware(scores, labels, bboxes, nms_thresh, num_classes)
-
-
-# ----------------- MLP modules -----------------
-class MLP(nn.Module):
-    def __init__(self, in_dim, hidden_dim, out_dim, num_layers):
-        super().__init__()
-        self.num_layers = num_layers
-        h = [hidden_dim] * (num_layers - 1)
-        self.layers = nn.ModuleList(nn.Linear(n, k) for n, k in zip([in_dim] + h, h + [out_dim]))
-
-    def forward(self, x):
-        for i, layer in enumerate(self.layers):
-            x = nn.functional.relu(layer(x)) if i < self.num_layers - 1 else layer(x)
-        return x
-
-class FFN(nn.Module):
-    def __init__(self, d_model=256, ffn_dim=1024, dropout=0., act_type='relu'):
-        super().__init__()
-        self.ffn_dim = ffn_dim
-        self.linear1 = nn.Linear(d_model, self.ffn_dim)
-        self.activation = get_activation(act_type)
-        self.dropout2 = nn.Dropout(dropout)
-        self.linear2 = nn.Linear(self.ffn_dim, d_model)
-        self.dropout3 = nn.Dropout(dropout)
-        self.norm = nn.LayerNorm(d_model)
-
-    def forward(self, src):
-        src2 = self.linear2(self.dropout2(self.activation(self.linear1(src))))
-        src = src + self.dropout3(src2)
-        src = self.norm(src)
-        
-        return src
-    
 
 # ----------------- Basic CNN Ops -----------------
 def get_conv2d(c1, c2, k, p, s, g, bias=False):
@@ -156,36 +51,8 @@ def conv1x1(in_planes: int, out_planes: int, stride: int = 1) -> nn.Conv2d:
     """1x1 convolution"""
     return nn.Conv2d(in_planes, out_planes, kernel_size=1, stride=stride, bias=False)
 
-class FrozenBatchNorm2d(torch.nn.Module):
-    def __init__(self, n):
-        super(FrozenBatchNorm2d, self).__init__()
-        self.register_buffer("weight", torch.ones(n))
-        self.register_buffer("bias", torch.zeros(n))
-        self.register_buffer("running_mean", torch.zeros(n))
-        self.register_buffer("running_var", torch.ones(n))
 
-    def _load_from_state_dict(self, state_dict, prefix, local_metadata, strict,
-                              missing_keys, unexpected_keys, error_msgs):
-        num_batches_tracked_key = prefix + 'num_batches_tracked'
-        if num_batches_tracked_key in state_dict:
-            del state_dict[num_batches_tracked_key]
-
-        super(FrozenBatchNorm2d, self)._load_from_state_dict(
-            state_dict, prefix, local_metadata, strict,
-            missing_keys, unexpected_keys, error_msgs)
-
-    def forward(self, x):
-        # move reshapes to the beginning
-        # to make it fuser-friendly
-        w = self.weight.reshape(1, -1, 1, 1)
-        b = self.bias.reshape(1, -1, 1, 1)
-        rv = self.running_var.reshape(1, -1, 1, 1)
-        rm = self.running_mean.reshape(1, -1, 1, 1)
-        eps = 1e-5
-        scale = w * (rv + eps).rsqrt()
-        bias = b - rm * scale
-        return x * scale + bias
-    
+# ----------------- CNN Modules -----------------
 class BasicConv(nn.Module):
     def __init__(self, 
                  in_dim,                   # in channels
@@ -220,8 +87,6 @@ class BasicConv(nn.Module):
             x = self.norm2(self.conv2(x))
             return x
 
-
-# ----------------- CNN Modules -----------------
 class Bottleneck(nn.Module):
     def __init__(self,
                  in_dim,

@@ -1,15 +1,11 @@
-import torch
-import torchvision
 from torch import nn
+import torchvision
 from torchvision.models._utils import IntermediateLayerGetter
 from torchvision.models.resnet import (ResNet18_Weights,
                                        ResNet34_Weights,
                                        ResNet50_Weights,
                                        ResNet101_Weights)
-try:
-    from .basic import FrozenBatchNorm2d
-except:
-    from basic  import FrozenBatchNorm2d
+from .norm import FrozenBatchNorm2d
    
 
 # IN1K pretrained weights
@@ -74,7 +70,7 @@ class ResNet(nn.Module):
         return_layers = {"layer2": "0", "layer3": "1", "layer4": "2"}
         self.body = IntermediateLayerGetter(backbone, return_layers=return_layers)
         self.feat_dims = [128, 256, 512] if name in ('resnet18', 'resnet34') else [512, 1024, 2048]
-        
+
         # Freeze
         print("- Freeze at: {}".format(freeze_at))
         if freeze_at >= 0:
