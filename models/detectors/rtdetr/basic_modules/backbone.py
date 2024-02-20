@@ -76,9 +76,11 @@ class ResNet(nn.Module):
         if freeze_at >= 0:
             for name, parameter in backbone.named_parameters():
                 if freeze_stem_only:
+                    print("- Freeze stem layer only")
                     if 'layer1' not in name and 'layer2' not in name and 'layer3' not in name and 'layer4' not in name:
                         parameter.requires_grad_(False)
                 else:
+                    print("- Freeze stem layer only + layer1")
                     if 'layer2' not in name and 'layer3' not in name and 'layer4' not in name:
                         parameter.requires_grad_(False)
 

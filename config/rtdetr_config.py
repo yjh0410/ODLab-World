@@ -123,9 +123,9 @@ class RTDetrR50Config(RTDetrBaseConfig):
         super().__init__()
         ## Backbone
         self.backbone        = 'resnet50'
-        self.backbone_norm   = 'FrozeBN'
+        self.backbone_norm   = 'BN'
         self.pretrained_weight  = 'imagenet1k_v2'
-        self.freeze_at = 0
+        self.freeze_at = -1
         self.freeze_stem_only = False
         ## Transformer Decoder
         self.de_num_layers = 6
