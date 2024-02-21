@@ -6,7 +6,7 @@ import torch.nn as nn
 from .yolo_backbone import YoloBackbone
 from .yolo_neck     import SPPF
 from .yolo_pafpn    import YoloPaFPN
-from .yolo_head     import YoloHead
+from .yolo_head     import YoloDetHead
 from .yolo_pred     import YoloPredLayer
 
 # --------------- External components ---------------
@@ -35,8 +35,8 @@ class Yolo(nn.Module):
         self.backbone    = YoloBackbone(cfg)
         self.neck        = SPPF(cfg, self.backbone.feat_dims[-1], self.backbone.feat_dims[-1])
         self.fpn         = YoloPaFPN(cfg, self.backbone.feat_dims)
-        self.head        = YoloHead(cfg, self.fpn.out_dims)
-        self.pred_layers = YoloPredLayer(cfg, self.head.cls_head_dim, self.head.reg_head_dim)
+        self.head        = YoloDetHead(cfg, self.fpn.out_dims)
+        self.pred        = YoloPredLayer(cfg, self.head.cls_head_dim, self.head.reg_head_dim)
 
     def post_process(self, cls_preds, box_preds):
         """
@@ -128,7 +128,7 @@ class Yolo(nn.Module):
         cls_feats, reg_feats = self.head(pyramid_feats)
 
         # ---------------- Preds ----------------
-        outputs = self.pred_layers(cls_feats, reg_feats)
+        outputs = self.pred(cls_feats, reg_feats)
         outputs['image_size'] = [x.shape[2], x.shape[3]]
 
         if not self.training:

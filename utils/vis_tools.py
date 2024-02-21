@@ -34,7 +34,7 @@ def visualize(image, bboxes, scores, labels, class_colors, class_names):
     return image
         
 ## Visualize the input data during the training stage
-def vis_data(images, targets, num_classes=80, normalized_bbox=False, pixel_mean=None, pixel_std=None, box_format="xyxy"):
+def vis_data(images, targets, num_classes=80, normalized_bbox=False, color_format='bgr', pixel_mean=None, pixel_std=None, box_format="xyxy"):
     """
         images: (tensor) [B, 3, H, W]
         targets: (list) a list of targets
@@ -54,6 +54,8 @@ def vis_data(images, targets, num_classes=80, normalized_bbox=False, pixel_mean=
         # denormalize image
         if pixel_mean is not None and pixel_std is not None:
             image = image * pixel_std + pixel_mean
+        
+        if color_format == 'rgb':
             image = image[..., (2, 1, 0)] # RGB to BGR
             
         image = image.astype(np.uint8)

@@ -223,7 +223,14 @@ class YoloTrainer(object):
                 
             # Visualize train targets
             if self.args.vis_tgt:
-                vis_data(images, targets, self.cfg.num_classes, self.cfg.normalize_coords, self.cfg.pixel_mean, self.cfg.pixel_std, self.cfg.box_format)
+                vis_data(images,
+                         targets,
+                         self.cfg.num_classes,
+                         self.cfg.normalize_coords,
+                         self.train_transform.color_format,
+                         self.cfg.pixel_mean,
+                         self.cfg.pixel_std,
+                         self.cfg.box_format)
 
             # Inference
             with torch.cuda.amp.autocast(enabled=self.args.fp16):
@@ -519,7 +526,14 @@ class RTDetrTrainer(object):
                 
             # Visualize train targets
             if self.args.vis_tgt:
-                vis_data(images, targets, self.cfg.num_classes, self.cfg.normalize_coords, self.cfg.pixel_mean, self.cfg.pixel_std, self.cfg.box_format)
+                vis_data(images,
+                         targets,
+                         self.cfg.num_classes,
+                         self.cfg.normalize_coords,
+                         self.train_transform.color_format,
+                         self.cfg.pixel_mean,
+                         self.cfg.pixel_std,
+                         self.cfg.box_format)
 
             # Inference
             with torch.cuda.amp.autocast(enabled=self.args.fp16):

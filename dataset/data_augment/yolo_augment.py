@@ -97,6 +97,11 @@ def augment_hsv(img, hgain=0.5, sgain=0.5, vgain=0.5):
     img_hsv = cv2.merge((cv2.LUT(hue, lut_hue), cv2.LUT(sat, lut_sat), cv2.LUT(val, lut_val))).astype(dtype)
     cv2.cvtColor(img_hsv, cv2.COLOR_HSV2BGR, dst=img)  # no return needed
 
+    if np.random.randint(2):
+        img = img[..., np.random.permutation(3)]
+
+    return img
+
 ## Ablu transform
 class Albumentations(object):
     def __init__(self, img_size=640):
@@ -158,10 +163,10 @@ class YOLOAugmentation(object):
             image, target = self.ablu_trans(image, target)
 
         # --------------- HSV augmentations ---------------
-        augment_hsv(image,
-                    hgain=self.affine_params['hsv_h'], 
-                    sgain=self.affine_params['hsv_s'], 
-                    vgain=self.affine_params['hsv_v'])
+        image = augment_hsv(image,
+                            hgain=self.affine_params['hsv_h'], 
+                            sgain=self.affine_params['hsv_s'], 
+                            vgain=self.affine_params['hsv_v'])
         
         # --------------- Spatial augmentations ---------------
         ## Random perspective

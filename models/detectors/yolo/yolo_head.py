@@ -88,7 +88,7 @@ class SingleLevelHead(nn.Module):
         return cls_feats, reg_feats
     
 # Multi-level Head
-class YoloHead(nn.Module):
+class YoloDetHead(nn.Module):
     def __init__(self, cfg, in_dims):
         super().__init__()
         ## ----------- Network Parameters -----------
