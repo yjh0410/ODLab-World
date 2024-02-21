@@ -110,15 +110,17 @@ def build_backbone(cfg):
 if __name__ == '__main__':
     import time
     from thop import profile
-    cfg = {
-        'bk_act': 'silu',
-        'bk_norm': 'BN',
-        'bk_depthwise': False,
-        'width': 0.25,
-        'depth': 0.34,
-        'ratio': 2.0,
-    }
-    model, feats = build_backbone(cfg)
+    class BaseConfig(object):
+        def __init__(self) -> None:
+            self.bk_act = 'silu'
+            self.bk_norm = 'BN'
+            self.bk_depthwise = False
+            self.width = 0.25
+            self.depth = 0.34
+            self.ratio = 2.0
+
+    cfg = BaseConfig()
+    model = build_backbone(cfg)
     x = torch.randn(1, 3, 640, 640)
     t0 = time.time()
     outputs = model(x)

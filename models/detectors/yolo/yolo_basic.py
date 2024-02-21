@@ -4,13 +4,6 @@ from typing import List
 
 
 # --------------------- Basic modules ---------------------
-class SiLU(nn.Module):
-    """export-friendly version of nn.SiLU()"""
-
-    @staticmethod
-    def forward(x):
-        return x * torch.sigmoid(x)
-
 def get_conv2d(c1, c2, k, p, s, d, g, bias=False):
     conv = nn.Conv2d(c1, c2, k, stride=s, padding=p, dilation=d, groups=g, bias=bias)
 
@@ -60,7 +53,7 @@ class BasicConv(nn.Module):
         else:
             self.conv1 = get_conv2d(in_dim, in_dim, k=kernel_size, p=padding, s=stride, d=dilation, g=in_dim)
             self.norm1 = get_norm(norm_type, in_dim)
-            self.conv2 = get_conv2d(in_dim, out_dim, k=kernel_size, p=padding, s=stride, d=dilation, g=1)
+            self.conv2 = get_conv2d(in_dim, out_dim, k=1, p=0, s=1, d=1, g=1)
             self.norm2 = get_norm(norm_type, out_dim)
         self.act  = get_activation(act_type)
 
