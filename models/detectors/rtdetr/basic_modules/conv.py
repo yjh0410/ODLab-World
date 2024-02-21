@@ -113,17 +113,18 @@ class Bottleneck(nn.Module):
 
         return x + h if self.shortcut else h
 
-class RTCBlock(nn.Module):
+class ELANLayer(nn.Module):
     def __init__(self,
                  in_dim,
                  out_dim,
-                 num_blocks = 1,
-                 shortcut   = False,
-                 act_type   = 'silu',
-                 norm_type  = 'BN',
-                 depthwise  = False,):
-        super(RTCBlock, self).__init__()
-        self.inter_dim = out_dim // 2
+                 num_blocks   = 1,
+                 expand_ratio = 0.5,
+                 shortcut     = False,
+                 act_type     = 'silu',
+                 norm_type    = 'BN',
+                 depthwise    = False,):
+        super(ELANLayer, self).__init__()
+        self.inter_dim = round(out_dim * expand_ratio)
         self.conv1 = BasicConv(in_dim, self.inter_dim, kernel_size=1, act_type=act_type, norm_type=norm_type)
         self.conv2 = BasicConv(in_dim, self.inter_dim, kernel_size=1, act_type=act_type, norm_type=norm_type)
         self.cmodules = nn.ModuleList([Bottleneck(self.inter_dim, self.inter_dim,

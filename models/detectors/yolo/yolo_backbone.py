@@ -2,16 +2,16 @@ import torch
 import torch.nn as nn
 
 try:
-    from .yolov8_basic import BasicConv, ELANLayer
+    from .yolo_basic import BasicConv, ELANLayer
 except:
-    from  yolov8_basic import BasicConv, ELANLayer
+    from  yolo_basic import BasicConv, ELANLayer
 
 
 # ---------------------------- Basic functions ----------------------------
 ## ELAN-CSPNet
-class Yolov8Backbone(nn.Module):
+class YoloBackbone(nn.Module):
     def __init__(self, cfg):
-        super(Yolov8Backbone, self).__init__()
+        super(YoloBackbone, self).__init__()
         # ------------------ Basic setting ------------------
         self.feat_dims = [round(64  * cfg.width),
                           round(128 * cfg.width),
@@ -27,10 +27,10 @@ class Yolov8Backbone(nn.Module):
         # P2/4
         self.layer_2 = nn.Sequential(
             BasicConv(self.feat_dims[0], self.feat_dims[1],
-                      kernel_size=3, padding=1, s=2,
+                      kernel_size=3, padding=1, stride=2,
                       act_type=cfg.bk_act, norm_type=cfg.bk_norm, depthwise=cfg.bk_depthwise),
-            ELANLayer(in_dim     = self.feat_dims[1],
-                      out_dim    = self.feat_dims[1],
+            ELANLayer(in_dim       = self.feat_dims[1],
+                      out_dim      = self.feat_dims[1],
                       num_blocks   = round(3*cfg.depth),
                       shortcut     = True,
                       act_type     = cfg.bk_act,
@@ -40,10 +40,10 @@ class Yolov8Backbone(nn.Module):
         # P3/8
         self.layer_3 = nn.Sequential(
             BasicConv(self.feat_dims[1], self.feat_dims[2],
-                      kernel_size=3, padding=1, s=2,
+                      kernel_size=3, padding=1, stride=2,
                       act_type=cfg.bk_act, norm_type=cfg.bk_norm, depthwise=cfg.bk_depthwise),
-            ELANLayer(in_dim     = self.feat_dims[2],
-                      out_dim    = self.feat_dims[2],
+            ELANLayer(in_dim       = self.feat_dims[2],
+                      out_dim      = self.feat_dims[2],
                       num_blocks   = round(6*cfg.depth),
                       shortcut     = True,
                       act_type     = cfg.bk_act,
@@ -53,10 +53,10 @@ class Yolov8Backbone(nn.Module):
         # P4/16
         self.layer_4 = nn.Sequential(
             BasicConv(self.feat_dims[2], self.feat_dims[3],
-                      kernel_size=3, padding=1, s=2,
+                      kernel_size=3, padding=1, stride=2,
                       act_type=cfg.bk_act, norm_type=cfg.bk_norm, depthwise=cfg.bk_depthwise),
-            ELANLayer(in_dim     = self.feat_dims[3],
-                      out_dim    = self.feat_dims[3],
+            ELANLayer(in_dim       = self.feat_dims[3],
+                      out_dim      = self.feat_dims[3],
                       num_blocks   = round(6*cfg.depth),
                       shortcut     = True,
                       act_type     = cfg.bk_act,
@@ -66,10 +66,10 @@ class Yolov8Backbone(nn.Module):
         # P5/32
         self.layer_5 = nn.Sequential(
             BasicConv(self.feat_dims[3], self.feat_dims[4],
-                      kernel_size=3, padding=1, s=2,
+                      kernel_size=3, padding=1, stride=2,
                       act_type=cfg.bk_act, norm_type=cfg.bk_norm, depthwise=cfg.bk_depthwise),
-            ELANLayer(in_dim     = self.feat_dims[4],
-                      out_dim    = self.feat_dims[4],
+            ELANLayer(in_dim       = self.feat_dims[4],
+                      out_dim      = self.feat_dims[4],
                       num_blocks   = round(3*cfg.depth),
                       shortcut     = True,
                       act_type     = cfg.bk_act,
@@ -99,10 +99,10 @@ class Yolov8Backbone(nn.Module):
 
 
 # ---------------------------- Functions ----------------------------
-## build Yolov8's Backbone
+## build Yolo's Backbone
 def build_backbone(cfg): 
     # model
-    backbone = Yolov8Backbone(cfg)
+    backbone = YoloBackbone(cfg)
         
     return backbone
 

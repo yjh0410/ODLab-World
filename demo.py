@@ -16,7 +16,8 @@ from utils.box_ops import rescale_bboxes
 from utils.vis_tools import visualize
 
 from models.detectors import build_model
-from config import build_model_config, build_trans_config, build_dataset_config
+from config import build_config
+from dataset.coco import coco_class_labels
 
 
 def parse_args():
@@ -44,26 +45,16 @@ def parse_args():
                         help='generate gif.')
 
     # Model setting
-    parser.add_argument('-m', '--model', default='yolov1', type=str,
+    parser.add_argument('-m', '--model', default='yolo_n', type=str,
                         help='build yolo')
     parser.add_argument('-nc', '--num_classes', default=80, type=int,
                         help='number of classes.')
     parser.add_argument('--weight', default=None,
                         type=str, help='Trained state_dict file path to open')
-    parser.add_argument('-ct', '--conf_thresh', default=0.35, type=float,
-                        help='confidence threshold')
-    parser.add_argument('-nt', '--nms_thresh', default=0.5, type=float,
-                        help='NMS threshold')
-    parser.add_argument('--topk', default=100, type=int,
-                        help='topk candidates dets of each level before NMS')
     parser.add_argument("--deploy", action="store_true", default=False,
                         help="deploy mode or not")
     parser.add_argument('--fuse_conv_bn', action='store_true', default=False,
                         help='fuse Conv & BN')
-    parser.add_argument('--no_multi_labels', action='store_true', default=False,
-                        help='Perform post-process with multi-labels trick.')
-    parser.add_argument('--nms_class_agnostic', action='store_true', default=False,
-                        help='Perform NMS operations regardless of category.')
 
     # Data setting
     parser.add_argument('-d', '--dataset', default='coco',
@@ -78,7 +69,6 @@ def detect(args,
            transform, 
            num_classes,
            class_names,
-           class_indexs,
            mode='image'):
     # class color
     np.random.seed(0)
@@ -130,8 +120,8 @@ def detect(args,
                                       scores=scores, 
                                       labels=labels,
                                       class_colors=class_colors,
-                                      class_names=class_names,
-                                      class_indexs=class_indexs)
+                                      class_names=class_names
+                                      )
                 frame_resized = cv2.resize(frame_vis, save_size)
                 out.write(frame_resized)
 
@@ -199,8 +189,8 @@ def detect(args,
                                       scores=scores, 
                                       labels=labels,
                                       class_colors=class_colors,
-                                      class_names=class_names,
-                                      class_indexs=class_indexs)
+                                      class_names=class_names
+                                      )
 
                 frame_resized = cv2.resize(frame_vis, save_size)
                 out.write(frame_resized)
@@ -256,8 +246,8 @@ def detect(args,
                                       scores=scores, 
                                       labels=labels,
                                       class_colors=class_colors,
-                                      class_names=class_names,
-                                      class_indexs=class_indexs)
+                                      class_names=class_names
+                                      )
             cv2.imwrite(os.path.join(save_path, str(i).zfill(6)+'.jpg'), img_processed)
             if args.show:
                 cv2.imshow('detection', img_processed)
@@ -274,24 +264,19 @@ def run():
         device = torch.device("cpu")
 
     # config
-    model_cfg = build_model_config(args)
-    trans_cfg = build_trans_config(model_cfg['trans_type'])
-    data_cfg  = build_dataset_config(args)
+    cfg = build_config(args)
+    cfg.num_classes = 80
+    cfg.class_labels = coco_class_labels
     
-    ## Data info
-    num_classes = data_cfg['num_classes']
-    class_names = data_cfg['class_names']
-    class_indexs = data_cfg['class_indexs']
-
     # build model
-    model = build_model(args, model_cfg, device, args.num_classes, False)
+    model = build_model(args, cfg, False)
 
     # load trained weight
     model = load_weight(model, args.weight, args.fuse_conv_bn)
     model.to(device).eval()
 
     # transform
-    val_transform, trans_cfg = build_transform(args, trans_cfg, model_cfg['max_stride'], is_train=False)
+    transform = build_transform(cfg, is_train=False)
 
     print("================= DETECT =================")
     # run
@@ -299,10 +284,9 @@ def run():
            mode         = args.mode,
            model        = model, 
            device       = device,
-           transform    = val_transform,
-           num_classes  = num_classes,
-           class_names  = class_names,
-           class_indexs = class_indexs,
+           transform    = transform,
+           num_classes  = cfg.num_classes,
+           class_names  = cfg.class_labels,
            )
 
 

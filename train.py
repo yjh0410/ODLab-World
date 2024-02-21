@@ -63,7 +63,7 @@ def parse_args():
                         help='batch size on all the GPUs.')
 
     # Model
-    parser.add_argument('-m', '--model', default='yolov8_n', type=str,
+    parser.add_argument('-m', '--model', default='yolo_n', type=str,
                         help='build yolo')
     parser.add_argument('-p', '--pretrained', default=None, type=str,
                         help='load pretrained weight')

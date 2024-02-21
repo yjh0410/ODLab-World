@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from typing import List
 
-from .conv import BasicConv, RTCBlock
+from .conv import BasicConv, ELANLayer
 from .transformer import TransformerEncoder
 
 
@@ -26,13 +26,13 @@ def build_fpn(cfg, in_dims):
         raise NotImplementedError("Unknown PaFPN: <{}>".format(cfg.fpn))
 
 
-# ----------------- Feature Pyramid Network -----------------
-## Hybrid Encoder (Transformer encoder + Convolutional PaFPN)
+# ----------------- Feature Pyramid Network -----------------## Hybrid Encoder (Transformer encoder + Convolutional PaFPN)
 class HybridEncoder(nn.Module):
     def __init__(self, 
                  in_dims        :List  = [256, 512, 1024],
                  out_dim        :int   = 256,
                  num_blocks     :int   = 3,
+                 expand_ratio   :float = 0.5,
                  act_type       :str   = 'silu',
                  norm_type      :str   = 'BN',
                  depthwise      :bool  = False,
@@ -81,43 +81,47 @@ class HybridEncoder(nn.Module):
 
         # ---------------- Top dwon FPN ----------------
         ## P5 -> P4
-        self.top_down_layer_1 = RTCBlock(in_dim      = self.out_dim * 2,
-                                         out_dim     = self.out_dim,
-                                         num_blocks  = num_blocks,
-                                         shortcut    = False,
-                                         act_type    = act_type,
-                                         norm_type   = norm_type,
-                                         depthwise   = depthwise,
-                                         )
+        self.top_down_layer_1 = ELANLayer(in_dim       = self.out_dim * 2,
+                                          out_dim      = self.out_dim,
+                                          num_blocks   = num_blocks,
+                                          expand_ratio = expand_ratio,
+                                          shortcut     = False,
+                                          act_type     = act_type,
+                                          norm_type    = norm_type,
+                                          depthwise    = depthwise,
+                                          )
         ## P4 -> P3
-        self.top_down_layer_2 = RTCBlock(in_dim      = self.out_dim * 2,
-                                         out_dim     = self.out_dim,
-                                         num_blocks  = num_blocks,
-                                         shortcut    = False,
-                                         act_type    = act_type,
-                                         norm_type   = norm_type,
-                                         depthwise   = depthwise,
-                                         )
+        self.top_down_layer_2 = ELANLayer(in_dim       = self.out_dim * 2,
+                                          out_dim      = self.out_dim,
+                                          num_blocks   = num_blocks,
+                                          expand_ratio = expand_ratio,
+                                          shortcut     = False,
+                                          act_type     = act_type,
+                                          norm_type    = norm_type,
+                                          depthwise    = depthwise,
+                                          )
         
         # ---------------- Bottom up PAN----------------
         ## P3 -> P4
-        self.bottom_up_layer_1 = RTCBlock(in_dim      = self.out_dim * 2,
-                                          out_dim     = self.out_dim,
-                                          num_blocks  = num_blocks,
-                                          shortcut    = False,
-                                          act_type    = act_type,
-                                          norm_type   = norm_type,
-                                          depthwise   = depthwise,
+        self.bottom_up_layer_1 = ELANLayer(in_dim       = self.out_dim * 2,
+                                           out_dim      = self.out_dim,
+                                           num_blocks   = num_blocks,
+                                           expand_ratio = expand_ratio,
+                                           shortcut     = False,
+                                           act_type     = act_type,
+                                           norm_type    = norm_type,
+                                           depthwise    = depthwise,
                                           )
         ## P4 -> P5
-        self.bottom_up_layer_2 = RTCBlock(in_dim      = self.out_dim * 2,
-                                          out_dim     = self.out_dim,
-                                          num_blocks  = num_blocks,
-                                          shortcut    = False,
-                                          act_type    = act_type,
-                                          norm_type   = norm_type,
-                                          depthwise   = depthwise,
-                                          )
+        self.bottom_up_layer_2 = ELANLayer(in_dim       = self.out_dim * 2,
+                                           out_dim      = self.out_dim,
+                                           num_blocks   = num_blocks,
+                                           expand_ratio = expand_ratio,
+                                           shortcut     = False,
+                                           act_type     = act_type,
+                                           norm_type    = norm_type,
+                                           depthwise    = depthwise,
+                                           )
 
         self.init_weights()
   

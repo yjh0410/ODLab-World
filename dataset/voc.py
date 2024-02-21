@@ -185,20 +185,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='VOC-Dataset')
 
     # opt
-    parser.add_argument('--root', default='/Users/liuhaoran/Desktop/python_work/object-detection/dataset/VOCdevkit/',
+    parser.add_argument('--root', default='D:/python_work/dataset/VOCdevkit/',
                         help='data root')
-    parser.add_argument('-size', '--img_size', default=640, type=int,
-                        help='input image size.')
-    parser.add_argument('--mosaic', default=0., type=float,
-                        help='mosaic augmentation.')
-    parser.add_argument('--mixup', default=0., type=float,
-                        help='mixup augmentation.')
-    parser.add_argument('--mixup_type', type=str, default='yolov5_mixup',
-                        help='mixup augmentation.')
     parser.add_argument('--is_train', action="store_true", default=False,
                         help='mixup augmentation.')
-    parser.add_argument('--load_cache', action="store_true", default=False,
-                        help='Path to the cached data.')
     
     args = parser.parse_args()
 
@@ -247,7 +237,7 @@ if __name__ == "__main__":
             self.aug_type = 'rtdetr'
 
 
-    cfg = RTDetrBaseConfig()
+    cfg = YoloBaseConfig()
     transform = build_transform(cfg, args.is_train)
     dataset = VOCDataset(cfg, args.root, [('2007', 'test')], transform, args.is_train)
     

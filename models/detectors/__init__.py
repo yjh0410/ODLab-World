@@ -2,16 +2,16 @@
 # -*- coding:utf-8 -*-
 
 import torch
-from .yolov8.build import build_yolov8
+from .yolo.build   import build_yolo
 from .rtdetr.build import build_rtdetr
 
 
 # build object detector
 def build_model(args, cfg, is_val=False):
     # ------------ build object detector ------------
-    ## YOLOv8    
-    if 'yolov8' in args.model:
-        model, criterion = build_yolov8(cfg, is_val)
+    ## YOLO    
+    if 'yolo' in args.model:
+        model, criterion = build_yolo(cfg, is_val)
     # RT-DETR
     elif 'rtdetr' in args.model:
         model, criterion = build_rtdetr(cfg, is_val)

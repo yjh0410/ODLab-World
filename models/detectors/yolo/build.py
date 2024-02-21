@@ -1,13 +1,13 @@
 import torch.nn as nn
 
 from .loss import SetCriterion
-from .yolov8 import Yolov8
+from .yolo import Yolo
 
 
 # build object detector
-def build_yolov8(cfg, is_val=False):
+def build_yolo(cfg, is_val=False):
     # -------------- Build YOLO --------------
-    model = Yolov8(cfg, is_val, deploy=False)
+    model = Yolo(cfg, is_val, deploy=False)
 
     # -------------- Initialize YOLO --------------
     for m in model.modules():

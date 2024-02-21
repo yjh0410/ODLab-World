@@ -80,7 +80,7 @@ class SingleLevelPredLayer(nn.Module):
         return outputs
 
 # Multi-level pred layer
-class Yolov8PredLayer(nn.Module):
+class YoloPredLayer(nn.Module):
     def __init__(self,
                  cfg,
                  cls_dim,
@@ -153,10 +153,3 @@ class Yolov8PredLayer(nn.Module):
                    }
 
         return outputs
-    
-
-# build detection head
-def build_pred_layer(cls_dim, reg_dim, strides, num_classes, num_coords=4, num_levels=3, reg_max=16):
-    pred_layers = Yolov8PredLayer(cls_dim, reg_dim, strides, num_classes, num_coords, num_levels, reg_max) 
-
-    return pred_layers

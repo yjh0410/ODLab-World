@@ -3,18 +3,18 @@ import torch.nn as nn
 import torch.nn.functional as F
 from typing import List
 
-from .yolov8_basic import BasicConv, ELANLayer
+from .yolo_basic import BasicConv, ELANLayer
 
 
 # PaFPN-ELAN
-class Yolov8PaFPN(nn.Module):
+class YoloPaFPN(nn.Module):
     def __init__(self,
                  cfg,
                  in_dims :List = [256, 512, 1024],
                  ) -> None:
-        super(Yolov8PaFPN, self).__init__()
+        super(YoloPaFPN, self).__init__()
         print('==============================')
-        print('FPN: {}'.format("Yolov8 PaFPN"))
+        print('FPN: {}'.format("Yolo PaFPN"))
         # --------------------------- Basic Parameters ---------------------------
         self.in_dims = in_dims[::-1]
         self.out_dims = [round(256*cfg.width), round(512*cfg.width), round(512*cfg.width*cfg.ratio)]

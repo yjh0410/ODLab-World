@@ -32,14 +32,7 @@ class MosaicAugment(object):
             orig_h, orig_w, _ = img_i.shape
 
             # ------------------ Resize ------------------
-            if np.random.randint(1):
-                r = self.img_size / max(orig_h, orig_w)
-                if r != 1: 
-                    interp = cv2.INTER_LINEAR if (self.is_train or r > 1) else cv2.INTER_AREA
-                    img_i = cv2.resize(img_i, (int(orig_w * r), int(orig_h * r)), interpolation=interp)
-            else:
-                interp = cv2.INTER_LINEAR if self.is_train else cv2.INTER_AREA
-                img_i = cv2.resize(img_i, (self.img_size, self.img_size), interpolation=interp)
+            img_i = cv2.resize(img_i, (self.img_size, self.img_size))
             h, w, _ = img_i.shape
 
             # ------------------ Create mosaic image ------------------

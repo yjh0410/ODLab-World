@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from .yolov8_basic import BasicConv
+from .yolo_basic import BasicConv
 
 
 # Single-level Head
@@ -39,7 +39,7 @@ class SingleLevelHead(nn.Module):
                               )
             else:
                 cls_feats.append(
-                    BasicConv(self.cls_head_dim, self.cls_head_dim, k=3, p=1, s=1, 
+                    BasicConv(self.cls_head_dim, self.cls_head_dim,
                               kernel_size=3, padding=1, stride=1, 
                               act_type=act_type,
                               norm_type=norm_type,
@@ -59,7 +59,7 @@ class SingleLevelHead(nn.Module):
                               )
             else:
                 reg_feats.append(
-                    BasicConv(self.reg_head_dim, self.reg_head_dim, k=3, p=1, s=1, 
+                    BasicConv(self.reg_head_dim, self.reg_head_dim,
                               kernel_size=3, padding=1, stride=1, 
                               act_type=act_type,
                               norm_type=norm_type,
@@ -88,7 +88,7 @@ class SingleLevelHead(nn.Module):
         return cls_feats, reg_feats
     
 # Multi-level Head
-class Yolov8Head(nn.Module):
+class YoloHead(nn.Module):
     def __init__(self, cfg, in_dims):
         super().__init__()
         ## ----------- Network Parameters -----------

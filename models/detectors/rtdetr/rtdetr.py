@@ -31,10 +31,8 @@ class RTDETR(nn.Module):
         # ----------- Network setting -----------
         ## Image encoder
         self.image_encoder = ImageEncoder(cfg)
-        self.fpn_dims = self.image_encoder.fpn_dims
-
         ## Detect decoder
-        self.detect_decoder = RTDETRTransformer(in_dims             = self.fpn_dims,
+        self.detect_decoder = RTDETRTransformer(in_dims             = self.image_encoder.fpn_dims,
                                                 hidden_dim          = cfg.hidden_dim,
                                                 strides             = cfg.out_stride,
                                                 num_classes         = cfg.num_classes,

@@ -1,22 +1,22 @@
-# yolov8-v2 Config
+# yolo-v2 Config
 
 
-def build_yolov8_config(args):
-    if   args.model == 'yolov8_n':
-        return YOLOv8nConfig()
-    elif args.model == 'yolov8_s':
-        return YOLOv8sConfig()
-    elif args.model == 'yolov8_m':
-        return YOLOv8mConfig()
-    elif args.model == 'yolov8_l':
-        return YOLOv8lConfig()
-    elif args.model == 'yolov8_x':
-        return YOLOv8xConfig()
+def build_yolo_config(args):
+    if   args.model == 'yolo_n':
+        return YOLOnConfig()
+    elif args.model == 'yolo_s':
+        return YOLOsConfig()
+    elif args.model == 'yolo_m':
+        return YOLOmConfig()
+    elif args.model == 'yolo_l':
+        return YOLOlConfig()
+    elif args.model == 'yolo_x':
+        return YOLOxConfig()
     else:
         raise NotImplementedError("No config for model: {}".format(args.model))
     
-# YOLOv8-Base config
-class YOLOv8BaseConfig(object):
+# YOLO-Base config
+class YOLOBaseConfig(object):
     def __init__(self) -> None:
         # ---------------- Model config ----------------
         self.width    = 1.0
@@ -27,7 +27,7 @@ class YOLOv8BaseConfig(object):
         self.max_stride = 32
         self.num_levels = 3
         ## Backbone
-        self.backbone = 'yolov8_backbone'
+        self.backbone = 'yolo_backbone'
         self.bk_act   = 'silu'
         self.bk_norm  = 'BN'
         self.bk_depthwise = False
@@ -39,12 +39,12 @@ class YOLOv8BaseConfig(object):
         self.neck_expand_ratio = 0.5
         self.spp_pooling_size  = 5
         ## FPN
-        self.fpn      = 'yolov8_pafpn'
+        self.fpn      = 'yolo_pafpn'
         self.fpn_act  = 'silu'
         self.fpn_norm = 'BN'
         self.fpn_depthwise = False
         ## Head
-        self.head      = 'yolov8_head'
+        self.head      = 'yolo_head'
         self.head_act  = 'silu'
         self.head_norm = 'BN'
         self.head_depthwise = False
@@ -119,8 +119,8 @@ class YOLOv8BaseConfig(object):
             'hsv_v': 0.4,
         }
 
-# YOLOv8-N
-class YOLOv8nConfig(YOLOv8BaseConfig):
+# YOLO-N
+class YOLOnConfig(YOLOBaseConfig):
     def __init__(self) -> None:
         super().__init__()
         # ---------------- Model config ----------------
@@ -142,8 +142,8 @@ class YOLOv8nConfig(YOLOv8BaseConfig):
             'hsv_v': 0.4,
         }
 
-# YOLOv8-S
-class YOLOv8sConfig(YOLOv8BaseConfig):
+# YOLO-S
+class YOLOsConfig(YOLOBaseConfig):
     def __init__(self) -> None:
         super().__init__()
         # ---------------- Model config ----------------
@@ -155,8 +155,8 @@ class YOLOv8sConfig(YOLOv8BaseConfig):
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.0
 
-# YOLOv8-M
-class YOLOv8mConfig(YOLOv8BaseConfig):
+# YOLO-M
+class YOLOmConfig(YOLOBaseConfig):
     def __init__(self) -> None:
         super().__init__()
         # ---------------- Model config ----------------
@@ -168,8 +168,8 @@ class YOLOv8mConfig(YOLOv8BaseConfig):
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.1
 
-# YOLOv8-L
-class YOLOv8lConfig(YOLOv8BaseConfig):
+# YOLO-L
+class YOLOlConfig(YOLOBaseConfig):
     def __init__(self) -> None:
         super().__init__()
         # ---------------- Model config ----------------
@@ -181,8 +181,8 @@ class YOLOv8lConfig(YOLOv8BaseConfig):
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.15
 
-# YOLOv8-X
-class YOLOv8xConfig(YOLOv8BaseConfig):
+# YOLO-X
+class YOLOxConfig(YOLOBaseConfig):
     def __init__(self) -> None:
         super().__init__()
         # ---------------- Model config ----------------

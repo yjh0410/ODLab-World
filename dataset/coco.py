@@ -193,24 +193,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='COCO-Dataset')
 
     # opt
-    parser.add_argument('--root', default='/Users/liuhaoran/Desktop/python_work/object-detection/dataset/COCO/',
+    parser.add_argument('--root', default='D:/python_work/dataset/COCO/',
                         help='data root')
-    parser.add_argument('--image_set', type=str, default='train2017',
-                        help='mixup augmentation.')
-    parser.add_argument('-size', '--img_size', default=640, type=int,
-                        help='input image size.')
-    parser.add_argument('--aug_type', type=str, default='ssd',
-                        help='augmentation type: ssd, yolov5, rtdetr.')
-    parser.add_argument('--mosaic', default=0., type=float,
-                        help='mosaic augmentation.')
-    parser.add_argument('--mixup', default=0., type=float,
-                        help='mixup augmentation.')
-    parser.add_argument('--mixup_type', type=str, default='yolov5_mixup',
-                        help='mixup augmentation.')
     parser.add_argument('--is_train', action="store_true", default=False,
                         help='mixup augmentation.')
-    parser.add_argument('--load_cache', action="store_true", default=False,
-                        help='load cached data.')
     
     args = parser.parse_args()
 
@@ -248,27 +234,15 @@ if __name__ == "__main__":
             # ---------------- Data process config ----------------
             self.box_format = 'xywh'
             self.normalize_coords = False
-            self.mosaic_prob = 1.0
-            self.mixup_prob  = 0.15
+            self.mosaic_prob = 0.0
+            self.mixup_prob  = 0.0
             ## Pixel mean & std
             self.pixel_mean = [0., 0., 0.]
             self.pixel_std  = [255., 255., 255.]
             ## Transforms
             self.train_img_size = 640
             self.test_img_size  = 640
-            self.random_crop_size = [320, 352, 384, 416, 448, 480, 512, 544, 576, 608, 640, 672, 704, 736, 768, 800]
-            self.use_ablu = True
             self.aug_type = 'rtdetr'
-            self.affine_params = {
-                'degrees': 0.0,
-                'translate': 0.2,
-                'scale': [0.1, 2.0],
-                'shear': 0.0,
-                'perspective': 0.0,
-                'hsv_h': 0.015,
-                'hsv_s': 0.7,
-                'hsv_v': 0.4,
-            }
 
     cfg = YoloBaseConfig()
     transform = build_transform(cfg, args.is_train)

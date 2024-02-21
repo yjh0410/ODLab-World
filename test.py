@@ -37,7 +37,7 @@ def parse_args():
                         help='resave checkpoints without optimizer state dict.')
 
     # Model setting
-    parser.add_argument('-m', '--model', default='yolov1', type=str,
+    parser.add_argument('-m', '--model', default='yolo_n', type=str,
                         help='build yolo')
     parser.add_argument('--weight', default=None,
                         type=str, help='Trained state_dict file path to open')
@@ -68,8 +68,7 @@ def test_det(args,
              dataset,
              transform=None,
              class_colors=None, 
-             class_names=None, 
-             class_indexs=None):
+             class_names=None):
     num_images = len(dataset)
     save_path = os.path.join('det_results/', args.dataset, args.model)
     os.makedirs(save_path, exist_ok=True)
@@ -171,5 +170,4 @@ if __name__ == '__main__':
              transform    = transform,
              class_colors = class_colors,
              class_names  = cfg.class_labels,
-             class_indexs = cfg.class_indexs,
              )

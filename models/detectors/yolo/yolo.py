@@ -3,24 +3,24 @@ import torch
 import torch.nn as nn
 
 # --------------- Model components ---------------
-from .yolov8_backbone import Yolov8Backbone
-from .yolov8_neck     import SPPF
-from .yolov8_pafpn    import Yolov8PaFPN
-from .yolov8_head     import Yolov8Head
-from .yolov8_pred     import Yolov8PredLayer
+from .yolo_backbone import YoloBackbone
+from .yolo_neck     import SPPF
+from .yolo_pafpn    import YoloPaFPN
+from .yolo_head     import YoloHead
+from .yolo_pred     import YoloPredLayer
 
 # --------------- External components ---------------
 from utils.misc import multiclass_nms
 
 
-# YOLOv8
-class Yolov8(nn.Module):
+# YOLO
+class Yolo(nn.Module):
     def __init__(self,
                  cfg,
                  is_val = False,
                  deploy = False,
                  ) -> None:
-        super(Yolov8, self).__init__()
+        super(Yolo, self).__init__()
         # ---------------------- Basic setting ----------------------
         self.cfg = cfg
         self.deploy = deploy
@@ -32,21 +32,11 @@ class Yolov8(nn.Module):
         self.no_multi_labels = False if is_val else True
         
         # ---------------------- Network Parameters ----------------------
-        ## Backbone
-        self.backbone = Yolov8Backbone(cfg)
-        self.pyramid_feat_dims = self.backbone.feat_dims[-3:]
-
-        ## Neck
-        self.neck = SPPF(cfg, self.pyramid_feat_dims[-1], self.pyramid_feat_dims[-1])
-        
-        ## FPN
-        self.fpn = Yolov8PaFPN(cfg, self.pyramid_feat_dims)
-
-        ## Head
-        self.det_heads = Yolov8Head(cfg, self.fpn.out_dims)
-
-        ## ----------- Preds -----------
-        self.pred_layers = Yolov8PredLayer(cfg, self.det_heads.cls_head_dim, self.det_heads.reg_head_dim)
+        self.backbone    = YoloBackbone(cfg)
+        self.neck        = SPPF(cfg, self.backbone.feat_dims[-1], self.backbone.feat_dims[-1])
+        self.fpn         = YoloPaFPN(cfg, self.backbone.feat_dims)
+        self.head        = YoloHead(cfg, self.fpn.out_dims)
+        self.pred_layers = YoloPredLayer(cfg, self.head.cls_head_dim, self.head.reg_head_dim)
 
     def post_process(self, cls_preds, box_preds):
         """
@@ -135,7 +125,7 @@ class Yolov8(nn.Module):
         pyramid_feats = self.fpn(pyramid_feats)
 
         # ---------------- Heads ----------------
-        cls_feats, reg_feats = self.det_heads(pyramid_feats)
+        cls_feats, reg_feats = self.head(pyramid_feats)
 
         # ---------------- Preds ----------------
         outputs = self.pred_layers(cls_feats, reg_feats)
