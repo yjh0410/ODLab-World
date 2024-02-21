@@ -331,20 +331,19 @@ class YoloTrainer(object):
             self.heavy_eval = True
 
         # close rotation augmentation
-        if 'degrees' in self.trans_cfg.keys() and self.trans_cfg['degrees'] > 0.0:
+        if 'degrees' in self.cfg.affine_params.keys() and self.cfg.affine_params['degrees'] > 0.0:
             print(' - Close < degress of rotation > ...')
-            self.trans_cfg['degrees'] = 0.0
-        if 'shear' in self.trans_cfg.keys() and self.trans_cfg['shear'] > 0.0:
+            self.cfg.affine_params['degrees'] = 0.0
+        if 'shear' in self.cfg.affine_params.keys() and self.cfg.affine_params['shear'] > 0.0:
             print(' - Close < shear of rotation >...')
-            self.trans_cfg['shear'] = 0.0
-        if 'perspective' in self.trans_cfg.keys() and self.trans_cfg['perspective'] > 0.0:
+            self.cfg.affine_params['shear'] = 0.0
+        if 'perspective' in self.cfg.affine_params.keys() and self.cfg.affine_params['perspective'] > 0.0:
             print(' - Close < perspective of rotation > ...')
-            self.trans_cfg['perspective'] = 0.0
+            self.cfg.affine_params['perspective'] = 0.0
 
         # build a new transform for second stage
         print(' - Rebuild transforms ...')
-        self.train_transform, self.trans_cfg = build_transform(
-            args=self.args, trans_config=self.trans_cfg, max_stride=self.model_cfg['max_stride'], is_train=True)
+        self.train_transform = build_transform(self.cfg, is_train=True)
         self.train_loader.dataset.transform = self.train_transform
         
     def check_third_stage(self):
@@ -353,16 +352,16 @@ class YoloTrainer(object):
         self.third_stage = True
 
         # close random affine
-        if 'translate' in self.trans_cfg.keys() and self.trans_cfg['translate'] > 0.0:
+        if 'translate' in self.cfg.affine_params.keys() and self.cfg.affine_params['translate'] > 0.0:
             print(' - Close < translate of affine > ...')
-            self.trans_cfg['translate'] = 0.0
-        if 'scale' in self.trans_cfg.keys():
+            self.cfg.affine_params['translate'] = 0.0
+        if 'scale' in self.cfg.affine_params.keys():
             print(' - Close < scale of affine >...')
-            self.trans_cfg['scale'] = [1.0, 1.0]
+            self.cfg.affine_params['scale'] = [1.0, 1.0]
 
         # build a new transform for second stage
         print(' - Rebuild transforms ...')
-        self.train_transform, self.trans_cfg = build_transform(self.cfg, is_train=True)
+        self.train_transform = build_transform(self.cfg, is_train=True)
         self.train_loader.dataset.transform = self.train_transform
 
 class RTDetrTrainer(object):

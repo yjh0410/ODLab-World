@@ -131,11 +131,18 @@ class Albumentations(object):
 # ------------------------- Preprocessers -------------------------
 ## YOLO-style Transform for Train
 class YOLOAugmentation(object):
-    def __init__(self, img_size=640, affine_params=None, use_ablu=False, box_format='xyxy', normalize_coords=False):
+    def __init__(self,
+                 img_size=640,
+                 affine_params=None,
+                 use_ablu=False,
+                 pixel_mean = [0., 0., 0.],
+                 pixel_std  = [255., 255., 255.],
+                 box_format='xyxy',
+                 normalize_coords=False):
         # Basic parameters
-        self.img_size = img_size
-        self.pixel_mean = [0., 0., 0.]
-        self.pixel_std  = [255., 255., 255.]
+        self.img_size   = img_size
+        self.pixel_mean = pixel_mean
+        self.pixel_std  = pixel_std
         self.box_format = box_format
         self.affine_params = affine_params
         self.normalize_coords = normalize_coords
@@ -217,11 +224,17 @@ class YOLOAugmentation(object):
 
 ## YOLO-style Transform for Eval
 class YOLOBaseTransform(object):
-    def __init__(self, img_size=640, max_stride=32, box_format='xyxy', normalize_coords=False):
+    def __init__(self,
+                 img_size=640,
+                 max_stride=32,
+                 pixel_mean = [0., 0., 0.],
+                 pixel_std  = [255., 255., 255.],
+                 box_format='xyxy',
+                 normalize_coords=False):
         self.img_size = img_size
         self.max_stride = max_stride
-        self.pixel_mean = [0., 0., 0.]
-        self.pixel_std  = [255., 255., 255.]
+        self.pixel_mean = pixel_mean
+        self.pixel_std  = pixel_std
         self.box_format = box_format
         self.normalize_coords = normalize_coords
         self.color_format = 'bgr'

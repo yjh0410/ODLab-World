@@ -66,17 +66,34 @@ def build_transform(cfg, is_train=False):
     ## YOLO style transform
     if cfg.aug_type == 'yolo':
         if is_train:
-            transform = YOLOAugmentation(cfg.train_img_size, cfg.affine_params, cfg.use_ablu, cfg.box_format, cfg.normalize_coords)
+            transform = YOLOAugmentation(cfg.train_img_size,
+                                         cfg.affine_params,
+                                         cfg.use_ablu,
+                                         cfg.pixel_mean,
+                                         cfg.pixel_std,
+                                         cfg.box_format,
+                                         cfg.normalize_coords)
         else:
-            transform = YOLOBaseTransform(cfg.test_img_size, cfg.max_stride, cfg.box_format, cfg.normalize_coords)
+            transform = YOLOBaseTransform(cfg.test_img_size,
+                                          cfg.max_stride,
+                                          cfg.pixel_mean,
+                                          cfg.pixel_std,
+                                          cfg.box_format,
+                                          cfg.normalize_coords)
 
     ## RT-DETR style transform
     elif cfg.aug_type == 'rtdetr':
         if is_train:
-            transform = RTDetrAugmentation(
-                cfg.train_img_size, cfg.pixel_mean, cfg.pixel_std, cfg.box_format, cfg.normalize_coords)
+            transform = RTDetrAugmentation(cfg.train_img_size,
+                                           cfg.pixel_mean,
+                                           cfg.pixel_std,
+                                           cfg.box_format,
+                                           cfg.normalize_coords)
         else:
-            transform = RTDetrBaseTransform(
-                cfg.test_img_size, cfg.pixel_mean, cfg.pixel_std, cfg.box_format, cfg.normalize_coords)
+            transform = RTDetrBaseTransform(cfg.test_img_size,
+                                            cfg.pixel_mean,
+                                            cfg.pixel_std,
+                                            cfg.box_format,
+                                            cfg.normalize_coords)
 
     return transform
