@@ -78,6 +78,7 @@ def test_det(args,
         image, _ = dataset.pull_image(index)
 
         orig_h, orig_w, _ = image.shape
+        orig_size = [orig_w, orig_h]
 
         # prepare
         x, _, ratio = transform(image)
@@ -92,7 +93,7 @@ def test_det(args,
         print("detection time used ", time.time() - t0, "s")
         
         # rescale bboxes
-        bboxes = rescale_bboxes(bboxes, [orig_w, orig_h], ratio)
+        bboxes = rescale_bboxes(bboxes, orig_size, ratio)
 
         # vis detection
         img_processed = visualize(image=image,

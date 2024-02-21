@@ -38,6 +38,7 @@ class COCOAPIEvaluator():
             # load an image
             img, id_ = self.dataset.pull_image(index)
             orig_h, orig_w, _ = img.shape
+            orig_size = [orig_w, orig_h]
 
             # preprocess
             x, _, ratio = self.transform(img)
@@ -53,7 +54,7 @@ class COCOAPIEvaluator():
             bboxes = outputs['bboxes']
 
             # rescale bboxes
-            bboxes = rescale_bboxes(bboxes, [orig_w, orig_h], ratio)
+            bboxes = rescale_bboxes(bboxes, orig_size, ratio)
 
             # process outputs
             for i, box in enumerate(bboxes):
