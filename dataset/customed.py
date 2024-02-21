@@ -182,22 +182,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='RT-ODLab')
 
     # opt
-    parser.add_argument('--root', default='/Users/liuhaoran/Desktop/python_work/object-detection/dataset/AnimalDataset/',
+    parser.add_argument('--root', default='D:/python_work/dataset/COCO/',
                         help='data root')
-    parser.add_argument('--split', default='train',
-                        help='data split')
-    parser.add_argument('-size', '--img_size', default=640, type=int, 
-                        help='input image size')
-    parser.add_argument('--min_box_size', default=8.0, type=float,
-                        help='min size of target bounding box.')
-    parser.add_argument('--mosaic', default=None, type=float,
-                        help='mosaic augmentation.')
-    parser.add_argument('--mixup', default=None, type=float,
-                        help='mixup augmentation.')
     parser.add_argument('--is_train', action="store_true", default=False,
                         help='mixup augmentation.')
-    parser.add_argument('--load_cache', action="store_true", default=False,
-                        help='load cached data.')
     
     args = parser.parse_args()
 
@@ -206,7 +194,7 @@ if __name__ == "__main__":
             self.max_stride = 32
             # ---------------- Data process config ----------------
             self.box_format = 'xywh'
-            self.normalize_coords = True
+            self.normalize_coords = False
             self.mosaic_prob = 1.0
             self.mixup_prob  = 0.15
             ## Pixel mean & std
@@ -235,27 +223,15 @@ if __name__ == "__main__":
             # ---------------- Data process config ----------------
             self.box_format = 'xywh'
             self.normalize_coords = False
-            self.mosaic_prob = 1.0
-            self.mixup_prob  = 0.15
+            self.mosaic_prob = 0.0
+            self.mixup_prob  = 0.0
             ## Pixel mean & std
             self.pixel_mean = [0., 0., 0.]
             self.pixel_std  = [255., 255., 255.]
             ## Transforms
             self.train_img_size = 640
             self.test_img_size  = 640
-            self.random_crop_size = [320, 352, 384, 416, 448, 480, 512, 544, 576, 608, 640, 672, 704, 736, 768, 800]
-            self.use_ablu = True
-            self.aug_type = 'yolo'
-            self.affine_params = {
-                'degrees': 0.0,
-                'translate': 0.2,
-                'scale': [0.1, 2.0],
-                'shear': 0.0,
-                'perspective': 0.0,
-                'hsv_h': 0.015,
-                'hsv_s': 0.7,
-                'hsv_v': 0.4,
-            }
+            self.aug_type = 'rtdetr'
 
     cfg = YoloBaseConfig()
     transform = build_transform(cfg, args.is_train)
@@ -279,7 +255,8 @@ if __name__ == "__main__":
         image = image * cfg.pixel_std + cfg.pixel_mean
 
         # rgb -> bgr
-        image = image[..., (2, 1, 0)]
+        if transform.color_format == 'rgb':
+            image = image[..., (2, 1, 0)]
 
         # to uint8
         image = image.astype(np.uint8)
