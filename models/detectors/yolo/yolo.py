@@ -32,11 +32,11 @@ class Yolo(nn.Module):
         self.no_multi_labels = False if is_val else True
         
         # ---------------------- Network Parameters ----------------------
-        self.backbone    = YoloBackbone(cfg)
-        self.neck        = SPPF(cfg, self.backbone.feat_dims[-1], self.backbone.feat_dims[-1])
-        self.fpn         = YoloPaFPN(cfg, self.backbone.feat_dims)
-        self.head        = YoloDetHead(cfg, self.fpn.out_dims)
-        self.pred        = YoloPredLayer(cfg, self.head.cls_head_dim, self.head.reg_head_dim)
+        self.backbone = YoloBackbone(cfg)
+        self.neck     = SPPF(cfg, self.backbone.feat_dims[-1], self.backbone.feat_dims[-1])
+        self.fpn      = YoloPaFPN(cfg, self.backbone.feat_dims)
+        self.head     = YoloDetHead(cfg, self.fpn.out_dims)
+        self.pred     = YoloPredLayer(cfg, self.head.cls_head_dim, self.head.reg_head_dim)
 
     def post_process(self, cls_preds, box_preds):
         """
