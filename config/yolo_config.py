@@ -26,11 +26,13 @@ class YOLOBaseConfig(object):
         self.out_stride = [8, 16, 32]
         self.max_stride = 32
         self.num_levels = 3
+        self.scale      = "b"
         ## Backbone
         self.backbone = 'yolo_backbone'
         self.bk_act   = 'silu'
         self.bk_norm  = 'BN'
         self.bk_depthwise = False
+        self.use_pretrained = False
         ## Neck
         self.neck           = 'sppf'
         self.neck_act       = 'silu'
@@ -119,6 +121,38 @@ class YOLOBaseConfig(object):
             'hsv_v': 0.4,
         }
 
+# YOLO-P config
+class YOLOpConfig(YOLOBaseConfig):
+    def __init__(self) -> None:
+        # ---------------- Model config ----------------
+        self.width = 0.25
+        self.depth = 0.34
+        self.ratio = 2.0
+        self.scale = "p"
+        ## Backbone
+        self.bk_depthwise   = True
+        self.use_pretrained = True
+        ## Neck
+        self.neck_depthwise = True
+        ## FPN
+        self.fpn_depthwise  = True
+        ## Head
+        self.head_depthwise = True
+
+        # ---------------- Data process config ----------------
+        self.mosaic_prob = 0.5
+        self.mixup_prob  = 0.0
+        self.affine_params = {
+            'degrees': 0.0,
+            'translate': 0.1,
+            'scale': [0.5, 1.5],
+            'shear': 0.0,
+            'perspective': 0.0,
+            'hsv_h': 0.015,
+            'hsv_s': 0.7,
+            'hsv_v': 0.4,
+        }
+
 # YOLO-N
 class YOLOnConfig(YOLOBaseConfig):
     def __init__(self) -> None:
@@ -127,6 +161,8 @@ class YOLOnConfig(YOLOBaseConfig):
         self.width = 0.25
         self.depth = 0.34
         self.ratio = 2.0
+        self.scale = "n"
+        self.use_pretrained = True
 
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
@@ -150,6 +186,8 @@ class YOLOsConfig(YOLOBaseConfig):
         self.width = 0.50
         self.depth = 0.34
         self.ratio = 2.0
+        self.scale = "s"
+        self.use_pretrained = True
 
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
@@ -163,6 +201,7 @@ class YOLOmConfig(YOLOBaseConfig):
         self.width = 0.75
         self.depth = 0.67
         self.ratio = 1.5
+        self.scale = "m"
 
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
@@ -176,6 +215,7 @@ class YOLOlConfig(YOLOBaseConfig):
         self.width = 1.0
         self.depth = 1.0
         self.ratio = 1.0
+        self.scale = "l"
 
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
@@ -189,6 +229,7 @@ class YOLOxConfig(YOLOBaseConfig):
         self.width = 1.25
         self.depth = 1.0
         self.ratio = 1.0
+        self.scale = "x"
 
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
