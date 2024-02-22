@@ -2,7 +2,9 @@
 
 
 def build_yolo_config(args):
-    if   args.model == 'yolo_n':
+    if   args.model == 'yolo_p':
+        return YOLOpConfig()
+    elif args.model == 'yolo_n':
         return YOLOnConfig()
     elif args.model == 'yolo_s':
         return YOLOsConfig()
