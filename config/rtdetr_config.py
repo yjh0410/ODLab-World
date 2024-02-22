@@ -42,11 +42,11 @@ class RTDetrBaseConfig(object):
         self.de_act        = 'relu'
         self.de_num_points = 4
         self.num_queries   = 300
-        self.learnt_init_query   = False
+        self.learnt_init_query = False
         ## DN
-        self.dn_num_denoising   = 100
+        self.dn_num_denoising     = 100
         self.dn_label_noise_ratio = 0.5
-        self.dn_box_noise_scale = 1
+        self.dn_box_noise_scale   = 1
 
         # ---------------- Post-process config ----------------
         ## Post process
