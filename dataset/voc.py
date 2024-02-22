@@ -188,7 +188,9 @@ if __name__ == "__main__":
     parser.add_argument('--root', default='D:/python_work/dataset/VOCdevkit/',
                         help='data root')
     parser.add_argument('--is_train', action="store_true", default=False,
-                        help='mixup augmentation.')
+                        help='train or not.')
+    parser.add_argument('--aug_type', default="yolo", type=str, choices=["yolo", "rtdetr"],
+                        help='yolo, rtdetr.')
     
     args = parser.parse_args()
 
@@ -236,8 +238,11 @@ if __name__ == "__main__":
             self.test_img_size  = 640
             self.aug_type = 'rtdetr'
 
+    if args.aug_type == "yolo":
+        cfg = YoloBaseConfig()
+    elif args.aug_type == "rtdetr":
+        cfg = RTDetrBaseConfig()
 
-    cfg = YoloBaseConfig()
     transform = build_transform(cfg, args.is_train)
     dataset = VOCDataset(cfg, args.root, [('2007', 'test')], transform, args.is_train)
     

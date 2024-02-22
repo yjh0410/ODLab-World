@@ -197,7 +197,9 @@ if __name__ == "__main__":
                         help='data root')
     parser.add_argument('--is_train', action="store_true", default=False,
                         help='mixup augmentation.')
-    
+    parser.add_argument('--aug_type', default="yolo", type=str, choices=["yolo", "rtdetr"],
+                        help='yolo, rtdetr.')
+
     args = parser.parse_args()
 
     class YoloBaseConfig(object):
@@ -244,7 +246,11 @@ if __name__ == "__main__":
             self.test_img_size  = 640
             self.aug_type = 'rtdetr'
 
-    cfg = YoloBaseConfig()
+    if args.aug_type == "yolo":
+        cfg = YoloBaseConfig()
+    elif args.aug_type == "rtdetr":
+        cfg = RTDetrBaseConfig()
+
     transform = build_transform(cfg, args.is_train)
     dataset = COCODataset(cfg, args.root, 'val2017', transform, args.is_train)
     

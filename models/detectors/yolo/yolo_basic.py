@@ -85,7 +85,7 @@ class YoloBottleneck(nn.Module):
         # ----------------- Network setting -----------------
         self.conv_layer1 = BasicConv(in_dim, inter_dim,
                                      kernel_size=kernel_size[0], padding=kernel_size[0]//2, stride=1,
-                                     act_type=act_type, norm_type=norm_type)
+                                     act_type=act_type, norm_type=norm_type, depthwise=depthwise)
         self.conv_layer2 = BasicConv(inter_dim, out_dim,
                                      kernel_size=kernel_size[1], padding=kernel_size[1]//2, stride=1,
                                      act_type=act_type, norm_type=norm_type, depthwise=depthwise)
