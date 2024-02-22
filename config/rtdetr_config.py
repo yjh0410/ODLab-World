@@ -87,7 +87,7 @@ class RTDetrBaseConfig(object):
         self.warmup_iters = 2000
         self.warmup_factor = 0.00066667
         self.lr_scheduler = "step"
-        self.lr_epoch = [66]
+        self.lr_epoch = [100]
         self.max_epoch = 72
         self.eval_epoch = 1
 
