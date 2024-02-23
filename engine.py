@@ -513,13 +513,13 @@ class RTDetrTrainer(object):
         # Train one epoch
         for iter_i, (images, targets) in enumerate(metric_logger.log_every(self.train_loader, print_freq, header)):
             ni = iter_i + self.epoch * epoch_size
-            # # WarmUp
-            # if ni < nw and lr_warmup_stage:
-            #     self.wp_lr_scheduler(ni, self.optimizer)
-            # elif ni == nw and lr_warmup_stage:
-            #     print('Warmup stage is over.')
-            #     lr_warmup_stage = False
-            #     self.wp_lr_scheduler.set_lr(self.optimizer, self.cfg.base_lr, self.cfg.base_lr)
+            # WarmUp
+            if ni < nw and lr_warmup_stage:
+                self.wp_lr_scheduler(ni, self.optimizer)
+            elif ni == nw and lr_warmup_stage:
+                print('Warmup stage is over.')
+                lr_warmup_stage = False
+                self.wp_lr_scheduler.set_lr(self.optimizer, self.cfg.base_lr, self.cfg.base_lr)
                                 
             # To device
             images = images.to(self.device, non_blocking=True).float()
