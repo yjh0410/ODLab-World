@@ -71,17 +71,17 @@ class BasicConv(nn.Module):
 # --------------------- Yolov8 modules ---------------------
 class YoloBottleneck(nn.Module):
     def __init__(self,
-                 in_dim       :int,
-                 out_dim      :int,
-                 kernel_size  :List  = [1, 3],
-                 expand_ratio :float = 0.5,
-                 shortcut     :bool  = False,
-                 act_type     :str   = 'silu',
-                 norm_type    :str   = 'BN',
-                 depthwise    :bool  = False,
+                 in_dim      :int,
+                 out_dim     :int,
+                 kernel_size :List  = [1, 3],
+                 expansion   :float = 0.5,
+                 shortcut    :bool  = False,
+                 act_type    :str   = 'silu',
+                 norm_type   :str   = 'BN',
+                 depthwise   :bool  = False,
                  ) -> None:
         super(YoloBottleneck, self).__init__()
-        inter_dim = int(out_dim * expand_ratio)
+        inter_dim = int(out_dim * expansion)
         # ----------------- Network setting -----------------
         self.conv_layer1 = BasicConv(in_dim, inter_dim,
                                      kernel_size=kernel_size[0], padding=kernel_size[0]//2, stride=1,
@@ -96,30 +96,66 @@ class YoloBottleneck(nn.Module):
 
         return x + h if self.shortcut else h
 
+class CSPLayer(nn.Module):
+    # CSP Bottleneck with 3 convolutions
+    def __init__(self,
+                 in_dim      :int,
+                 out_dim     :int,
+                 num_blocks  :int   = 1,
+                 kernel_size :List = [3, 3],
+                 expansion   :float = 0.5,
+                 shortcut    :bool  = True,
+                 act_type    :str   = 'silu',
+                 norm_type   :str   = 'BN',
+                 depthwise   :bool  = False,
+                 ) -> None:
+        super().__init__()
+        inter_dim = round(out_dim * expansion)
+        self.input_proj_1 = BasicConv(in_dim, inter_dim, kernel_size=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
+        self.input_proj_2 = BasicConv(in_dim, inter_dim, kernel_size=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
+        self.output_proj  = BasicConv(2 * inter_dim, out_dim, kernel_size=1, act_type=act_type, norm_type=norm_type, depthwise=depthwise)
+        self.module       = nn.Sequential(*[YoloBottleneck(inter_dim,
+                                                           inter_dim,
+                                                           kernel_size,
+                                                           expansion   = 1.0,
+                                                           shortcut    = shortcut,
+                                                           act_type    = act_type,
+                                                           norm_type   = norm_type,
+                                                           depthwise   = depthwise,
+                                                           ) for _ in range(num_blocks)])
+
+    def forward(self, x):
+        x1 = self.input_proj_1(x)
+        x2 = self.input_proj_2(x)
+        x2 = self.module(x2)
+        out = self.output_proj(torch.cat([x1, x2], dim=1))
+
+        return out
+
 class ELANLayer(nn.Module):
     def __init__(self,
                  in_dim,
                  out_dim,
-                 expand_ratio :float = 0.5,
-                 num_blocks   :int   = 1,
-                 shortcut     :bool  = False,
-                 act_type     :str   = 'silu',
-                 norm_type    :str   = 'BN',
-                 depthwise    :bool  = False,
+                 expansion  :float = 0.5,
+                 num_blocks :int   = 1,
+                 shortcut   :bool  = False,
+                 act_type   :str   = 'silu',
+                 norm_type  :str   = 'BN',
+                 depthwise  :bool  = False,
                  ) -> None:
         super(ELANLayer, self).__init__()
-        self.inter_dim = round(out_dim * expand_ratio)
-        self.input_proj  = BasicConv(in_dim, self.inter_dim * 2, kernel_size=1, act_type=act_type, norm_type=norm_type)
-        self.output_proj = BasicConv((2 + num_blocks) * self.inter_dim, out_dim, kernel_size=1, act_type=act_type, norm_type=norm_type)
-        self.module = nn.ModuleList([YoloBottleneck(self.inter_dim,
-                                                    self.inter_dim,
-                                                    kernel_size  = [3, 3],
-                                                    expand_ratio = 1.0,
-                                                    shortcut     = shortcut,
-                                                    act_type     = act_type,
-                                                    norm_type    = norm_type,
-                                                    depthwise    = depthwise)
-                                                    for _ in range(num_blocks)])
+        inter_dim = round(out_dim * expansion)
+        self.input_proj  = BasicConv(in_dim, inter_dim * 2, kernel_size=1, act_type=act_type, norm_type=norm_type)
+        self.output_proj = BasicConv((2 + num_blocks) * inter_dim, out_dim, kernel_size=1, act_type=act_type, norm_type=norm_type)
+        self.module      = nn.ModuleList([YoloBottleneck(inter_dim,
+                                                         inter_dim,
+                                                         kernel_size = [3, 3],
+                                                         expansion   = 1.0,
+                                                         shortcut    = shortcut,
+                                                         act_type    = act_type,
+                                                         norm_type   = norm_type,
+                                                         depthwise   = depthwise)
+                                                         for _ in range(num_blocks)])
 
     def forward(self, x):
         # Input proj

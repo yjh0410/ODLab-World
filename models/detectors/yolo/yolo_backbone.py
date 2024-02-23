@@ -41,52 +41,56 @@ class YoloBackbone(nn.Module):
             BasicConv(self.feat_dims[0], self.feat_dims[1],
                       kernel_size=3, padding=1, stride=2,
                       act_type=cfg.bk_act, norm_type=cfg.bk_norm, depthwise=cfg.bk_depthwise),
-            ELANLayer(in_dim       = self.feat_dims[1],
-                      out_dim      = self.feat_dims[1],
-                      num_blocks   = round(3*cfg.depth),
-                      shortcut     = True,
-                      act_type     = cfg.bk_act,
-                      norm_type    = cfg.bk_norm,
-                      depthwise    = cfg.bk_depthwise)
+            ELANLayer(in_dim     = self.feat_dims[1],
+                      out_dim    = self.feat_dims[1],
+                      num_blocks = round(3*cfg.depth),
+                      expansion  = 0.5,
+                      shortcut   = True,
+                      act_type   = cfg.bk_act,
+                      norm_type  = cfg.bk_norm,
+                      depthwise  = cfg.bk_depthwise)
         )
         # P3/8
         self.layer_3 = nn.Sequential(
             BasicConv(self.feat_dims[1], self.feat_dims[2],
                       kernel_size=3, padding=1, stride=2,
                       act_type=cfg.bk_act, norm_type=cfg.bk_norm, depthwise=cfg.bk_depthwise),
-            ELANLayer(in_dim       = self.feat_dims[2],
-                      out_dim      = self.feat_dims[2],
-                      num_blocks   = round(6*cfg.depth),
-                      shortcut     = True,
-                      act_type     = cfg.bk_act,
-                      norm_type    = cfg.bk_norm,
-                      depthwise    = cfg.bk_depthwise)
+            ELANLayer(in_dim     = self.feat_dims[2],
+                      out_dim    = self.feat_dims[2],
+                      num_blocks = round(6*cfg.depth),
+                      expansion  = 0.5,
+                      shortcut   = True,
+                      act_type   = cfg.bk_act,
+                      norm_type  = cfg.bk_norm,
+                      depthwise  = cfg.bk_depthwise)
         )
         # P4/16
         self.layer_4 = nn.Sequential(
             BasicConv(self.feat_dims[2], self.feat_dims[3],
                       kernel_size=3, padding=1, stride=2,
                       act_type=cfg.bk_act, norm_type=cfg.bk_norm, depthwise=cfg.bk_depthwise),
-            ELANLayer(in_dim       = self.feat_dims[3],
-                      out_dim      = self.feat_dims[3],
-                      num_blocks   = round(6*cfg.depth),
-                      shortcut     = True,
-                      act_type     = cfg.bk_act,
-                      norm_type    = cfg.bk_norm,
-                      depthwise    = cfg.bk_depthwise)
+            ELANLayer(in_dim     = self.feat_dims[3],
+                      out_dim    = self.feat_dims[3],
+                      num_blocks = round(6*cfg.depth),
+                      expansion  = 0.5,
+                      shortcut   = True,
+                      act_type   = cfg.bk_act,
+                      norm_type  = cfg.bk_norm,
+                      depthwise  = cfg.bk_depthwise)
         )
         # P5/32
         self.layer_5 = nn.Sequential(
             BasicConv(self.feat_dims[3], self.feat_dims[4],
                       kernel_size=3, padding=1, stride=2,
                       act_type=cfg.bk_act, norm_type=cfg.bk_norm, depthwise=cfg.bk_depthwise),
-            ELANLayer(in_dim       = self.feat_dims[4],
-                      out_dim      = self.feat_dims[4],
-                      num_blocks   = round(3*cfg.depth),
-                      shortcut     = True,
-                      act_type     = cfg.bk_act,
-                      norm_type    = cfg.bk_norm,
-                      depthwise    = cfg.bk_depthwise)
+            ELANLayer(in_dim     = self.feat_dims[4],
+                      out_dim    = self.feat_dims[4],
+                      num_blocks = round(3*cfg.depth),
+                      expansion  = 0.5,
+                      shortcut   = True,
+                      act_type   = cfg.bk_act,
+                      norm_type  = cfg.bk_norm,
+                      depthwise  = cfg.bk_depthwise)
         )
 
         # Initialize all layers
