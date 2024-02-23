@@ -483,6 +483,7 @@ class RTDetrTrainer(object):
                     torch.save({'model': model_eval.state_dict(),
                                 'mAP': round(self.best_map*100, 1),
                                 'optimizer': self.optimizer.state_dict(),
+                                'lr_scheduler': self.lr_scheduler.state_dict(),
                                 'epoch': self.epoch,
                                 'args': self.args}, 
                                 checkpoint_path)                      
