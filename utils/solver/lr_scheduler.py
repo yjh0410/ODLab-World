@@ -47,13 +47,13 @@ def build_lr_scheduler(cfg, optimizer, resume=None):
     elif cfg.lr_scheduler == 'cosine':
         pass
         
-    # if resume is not None and resume.lower() != "none":
-    #     checkpoint = torch.load(resume)
-    #     if 'lr_scheduler' in checkpoint.keys():
-    #         print('keep training: ', resume)
-    #         # checkpoint state dict
-    #         checkpoint_state_dict = checkpoint.pop("lr_scheduler")
-    #         lr_scheduler.load_state_dict(checkpoint_state_dict)
+    if resume is not None and resume.lower() != "none":
+        checkpoint = torch.load(resume)
+        if 'lr_scheduler' in checkpoint.keys():
+            print('keep training: ', resume)
+            # checkpoint state dict
+            checkpoint_state_dict = checkpoint.pop("lr_scheduler")
+            lr_scheduler.load_state_dict(checkpoint_state_dict)
 
     return lr_scheduler
 
