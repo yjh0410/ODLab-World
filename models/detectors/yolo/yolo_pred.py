@@ -114,7 +114,6 @@ class YoloPredLayer(nn.Module):
         all_cls_preds = []
         all_reg_preds = []
         all_box_preds = []
-        all_delta_preds = []
         for level in range(self.cfg.num_levels):
             # -------------- Single-level prediction --------------
             outputs = self.multi_level_preds[level](cls_feats[level], reg_feats[level])
@@ -138,7 +137,6 @@ class YoloPredLayer(nn.Module):
             all_cls_preds.append(outputs["pred_cls"])
             all_reg_preds.append(outputs["pred_reg"])
             all_box_preds.append(box_pred)
-            all_delta_preds.append(delta_pred)
             all_anchors.append(outputs["anchors"])
             all_strides.append(outputs["stride_tensor"])
         
@@ -146,7 +144,6 @@ class YoloPredLayer(nn.Module):
         outputs = {"pred_cls":      all_cls_preds,         # List(Tensor) [B, M, C]
                    "pred_reg":      all_reg_preds,         # List(Tensor) [B, M, 4*(reg_max)]
                    "pred_box":      all_box_preds,         # List(Tensor) [B, M, 4]
-                   "pred_delta":    all_delta_preds,       # List(Tensor) [B, M, 4]
                    "anchors":       all_anchors,           # List(Tensor) [M, 2]
                    "stride_tensor": all_strides,           # List(Tensor) [M, 1]
                    "strides":       self.cfg.out_stride,   # List(Int) = [8, 16, 32]
