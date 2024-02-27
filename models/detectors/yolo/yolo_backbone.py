@@ -113,8 +113,9 @@ class YoloBackbone(nn.Module):
         if url is not None:
             print('Loading backbone pretrained weight from : {}'.format(url))
             # checkpoint state dict
-            checkpoint_state_dict = torch.hub.load_state_dict_from_url(
+            checkpoint = torch.hub.load_state_dict_from_url(
                 url=url, map_location="cpu", check_hash=True)
+            checkpoint_state_dict = checkpoint.pop("model")
             # model state dict
             model_state_dict = self.state_dict()
             # check
