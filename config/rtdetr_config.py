@@ -24,6 +24,7 @@ class RTDetrBaseConfig(object):
         ## Image Encoder - FPN
         self.fpn      = 'hybrid_encoder'
         self.fpn_num_blocks = 3
+        self.fpn_expand_ratio = 0.5
         self.fpn_act  = 'silu'
         self.fpn_norm = 'BN'
         self.fpn_depthwise = False

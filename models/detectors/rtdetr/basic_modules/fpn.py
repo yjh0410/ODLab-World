@@ -13,6 +13,7 @@ def build_fpn(cfg, in_dims):
         return HybridEncoder(in_dims     = in_dims,
                              out_dim     = cfg.hidden_dim,
                              num_blocks  = cfg.fpn_num_blocks,
+                             expand_ratio= cfg.fpn_expand_ratio,
                              act_type    = cfg.fpn_act,
                              norm_type   = cfg.fpn_norm,
                              depthwise   = cfg.fpn_depthwise,
