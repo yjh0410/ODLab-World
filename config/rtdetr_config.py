@@ -105,6 +105,11 @@ class RTDetrBaseConfig(object):
         self.train_img_size = 640
         self.test_img_size  = 640
 
+    def print_config(self):
+        config_dict = {key: value for key, value in self.__dict__.items() if not key.startswith('__')}
+        for k, v in config_dict.items():
+            print("{} : {}".format(k, v))
+    
 # RT-DETR-R18
 class RTDetrR18Config(RTDetrBaseConfig):
     def __init__(self) -> None:

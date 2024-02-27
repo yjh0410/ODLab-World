@@ -123,6 +123,11 @@ class YOLOBaseConfig(object):
             'hsv_v': 0.4,
         }
 
+    def print_config(self):
+        config_dict = {key: value for key, value in self.__dict__.items() if not key.startswith('__')}
+        for k, v in config_dict.items():
+            print("{} : {}".format(k, v))
+
 # YOLO-P config
 class YOLOpConfig(YOLOBaseConfig):
     def __init__(self) -> None:

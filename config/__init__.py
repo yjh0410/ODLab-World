@@ -13,6 +13,9 @@ def build_config(args):
         cfg = build_rtdetr_config(args)
     else:
         raise NotImplementedError("Unknown model config: {}".format(args.model))
+    
+    # Print model config
+    cfg.print_config()
 
     return cfg
 
