@@ -4,7 +4,7 @@
 |     Model    | Batch | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>val<br>0.5 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight | Logs |
 |--------------|-------|-------|------------------------|-------------------|-------------------|--------------------|--------|------|
 | RT-DETR-R18  | 4xb4  |  640  |           45.5         |        63.5       |        66.8       |        21.0        | [ckpt](https://github.com/yjh0410/ODLab-World/releases/download/coco_weight/rtdetr_r18_coco.pth) | [log](https://github.com/yjh0410/ODLab-World/releases/download/coco_weight/RT-DETR-R18-COCO.txt)|
-| RT-DETR-R50  | 4xb4  |  640  |                        |                   |                   |                    |  | |
+| RT-DETR-R50  | 4xb4  |  640  |           50.6         |        69.4       |       112.1       |        36.7        | [ckpt](https://github.com/yjh0410/ODLab-World/releases/download/coco_weight/rtdetr_r50_coco.pth) | [log](https://github.com/yjh0410/ODLab-World/releases/download/coco_weight/RT-DETR-R50-COCO.txt)|
 | RT-DETR-R101 | 4xb4  |  640  |                        |                   |                   |                    |  | |
 
 
