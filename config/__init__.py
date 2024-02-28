@@ -6,7 +6,7 @@ def build_config(args):
     print('==============================')
     print('Model: {} ...'.format(args.model.upper()))
     # YOLOv1
-    if args.model in ['yolo_n', 'yolo_s', 'yolo_m', 'yolo_l', 'yolo_x']:
+    if args.model in ['yolo_p', 'yolo_n', 'yolo_s', 'yolo_m', 'yolo_l', 'yolo_x']:
         cfg = build_yolo_config(args)
     # RT-DETR
     elif args.model in ['rtdetr_r18', 'rtdetr_r34', 'rtdetr_r50', 'rtdetr_r101']:
