@@ -13,7 +13,7 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 
 # ----------------- Extra Components -----------------
 from utils import distributed_utils
-from utils.misc import compute_flops, build_dataloader, CollateFunc
+from utils.misc import compute_flops, build_dataloader, CollateFunc, ModelEMA
 
 # ----------------- Config Components -----------------
 from config import build_config
@@ -156,6 +156,13 @@ def train():
     model = model.to(device).train()
     model_without_ddp = model
 
+    # ---------------------------- Build Model-EMA ----------------------------
+    if cfg.use_ema and distributed_utils.get_rank() in [-1, 0]:
+        print('Build ModelEMA for {} ...'.format(args.model))
+        model_ema = ModelEMA(model, cfg.ema_decay, cfg.ema_tau)
+    else:
+        model_ema = None
+
     ## Calcute Params & GFLOPs
     if distributed_utils.is_main_process:
         model_copy = deepcopy(model_without_ddp)
@@ -187,7 +194,7 @@ def train():
         dist.barrier()
 
     # ---------------------------- Build Trainer ----------------------------
-    trainer = build_trainer(args, cfg, device, model, criterion, train_transform, val_transform, dataset, train_loader, evaluator)
+    trainer = build_trainer(args, cfg, device, model, model_ema, criterion, train_transform, val_transform, dataset, train_loader, evaluator)
 
     # ---------------------------- Train pipeline ----------------------------
     trainer.train(model)

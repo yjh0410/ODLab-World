@@ -26,6 +26,7 @@ class YoloTrainer(object):
                  device,
                  # Model parameters
                  model,
+                 model_ema,
                  criterion,
                  # Data parameters
                  train_transform,
@@ -42,6 +43,7 @@ class YoloTrainer(object):
         self.device = device
         self.criterion = criterion
         self.heavy_eval = False
+        self.model_ema = model_ema
         # weak augmentatino stage
         self.second_stage = False
         self.second_stage_epoch = cfg.no_aug_epoch
@@ -74,12 +76,10 @@ class YoloTrainer(object):
             self.lr_scheduler.step()
 
         # ---------------------------- Build Model-EMA ----------------------------
-        if cfg.use_ema and distributed_utils.get_rank() in [-1, 0]:
-            print('Build ModelEMA for {} ...'.format(args.model))
+        if self.model_ema is not None:
             update_init = self.start_epoch * len(self.train_loader)
-            self.model_ema = ModelEMA(model, cfg.ema_decay, cfg.ema_tau, update_init)
-        else:
-            self.model_ema = None
+            print("Initialize ModelEMA's updates: {}".format(update_init))
+            self.model_ema.updates = update_init
 
     def train(self, model):
         for epoch in range(self.start_epoch, self.cfg.max_epoch):
@@ -320,6 +320,7 @@ class RTDetrTrainer(object):
                  device,
                  # Model parameters
                  model,
+                 model_ema,
                  criterion,
                  # Data parameters
                  train_transform,
@@ -336,6 +337,7 @@ class RTDetrTrainer(object):
         self.device = device
         self.criterion = criterion
         self.heavy_eval = False
+        self.model_ema = model_ema
         # path to save model
         self.path_to_save = os.path.join(args.save_folder, args.dataset, args.model)
         os.makedirs(self.path_to_save, exist_ok=True)
@@ -363,12 +365,10 @@ class RTDetrTrainer(object):
         self.lr_scheduler    = build_lr_scheduler(cfg, self.optimizer, args.resume)
 
         # ---------------------------- Build Model-EMA ----------------------------
-        if cfg.use_ema and distributed_utils.get_rank() in [-1, 0]:
-            print('Build ModelEMA for {} ...'.format(args.model))
+        if self.model_ema is not None:
             update_init = self.start_epoch * len(self.train_loader)
-            self.model_ema = ModelEMA(model, cfg.ema_decay, cfg.ema_tau, update_init)
-        else:
-            self.model_ema = None
+            print("Initialize ModelEMA's updates: {}".format(update_init))
+            self.model_ema.updates = update_init            
 
     def train(self, model):
         for epoch in range(self.start_epoch, self.cfg.max_epoch):
@@ -551,12 +551,12 @@ class RTDetrTrainer(object):
 
 
 # Build Trainer
-def build_trainer(args, cfg, device, model, criterion, train_transform, val_transform, dataset, train_loader, evaluator):
+def build_trainer(args, cfg, device, model, model_ema, criterion, train_transform, val_transform, dataset, train_loader, evaluator):
     # ----------------------- Det trainers -----------------------
     if   cfg.trainer == 'yolo':
-        return YoloTrainer(args, cfg, device, model, criterion, train_transform, val_transform, dataset, train_loader, evaluator)
+        return YoloTrainer(args, cfg, device, model, model_ema, criterion, train_transform, val_transform, dataset, train_loader, evaluator)
     elif cfg.trainer == 'rtdetr':
-        return RTDetrTrainer(args, cfg, device, model, criterion, train_transform, val_transform, dataset, train_loader, evaluator)
+        return RTDetrTrainer(args, cfg, device, model, model_ema, criterion, train_transform, val_transform, dataset, train_loader, evaluator)
     else:
         raise NotImplementedError(cfg.trainer)
     
