@@ -2,12 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-try:
-    from .basic_modules.backbone import build_backbone
-    from .basic_modules.fpn      import build_fpn
-except:
-    from  basic_modules.backbone import build_backbone
-    from  basic_modules.fpn      import build_fpn
+from .basic_modules.backbone import build_backbone
+from .basic_modules.fpn      import build_fpn
 
 
 # ----------------- Image Encoder -----------------
