@@ -41,8 +41,8 @@ class Yolo(nn.Module):
     def post_process(self, cls_preds, box_preds):
         """
         Input:
-            cls_preds: List[np.array] -> [[M, C], ...]
-            box_preds: List[np.array] -> [[M, 4], ...]
+            cls_preds: List[torch.Tensor] -> [[B, M, C], ...], B=1
+            box_preds: List[torch.Tensor] -> [[B, M, 4], ...], B=1
         Output:
             bboxes: np.array -> [N, 4]
             scores: np.array -> [N,]

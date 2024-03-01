@@ -10,6 +10,14 @@ def build_rtdetr_config(args):
         return RTDetrR50Config()
     elif args.model == "rtdetr_r101":
         return RTDetrR101Config()
+    elif args.model == "rtdetr_n":
+        return RTDetrNConfig()
+    elif args.model == "rtdetr_s":
+        return RTDetrSConfig()
+    elif args.model == "rtdetr_m":
+        return RTDetrMConfig()
+    elif args.model == "rtdetr_l":
+        return RTDetrLConfig()
     raise NotImplementedError("No config for model: {}".format(args.model))
     
 # rtdetr-Base config
@@ -165,3 +173,159 @@ class RTDetrR101Config(RTDetrBaseConfig):
         self.freeze_stem_only = False
         ## Transformer Decoder
         self.de_num_layers = 6
+
+# RT-DETR-Nano (not complete yet)
+class RTDetrNConfig(RTDetrBaseConfig):
+    def __init__(self) -> None:
+        super().__init__()
+        # ---------------- Model config ----------------
+        self.width    = 0.25
+        self.depth    = 0.34
+        self.ratio    = 2.0
+        self.out_stride = [8, 16, 32]
+        self.max_stride = 32
+        self.scale      = "n"
+        ## Backbone
+        self.backbone = 'rtcnet'
+        self.bk_act   = 'silu'
+        self.bk_norm  = 'BN'
+        self.bk_depthwise = False
+        self.use_pretrained = True
+        ## Image Encoder - FPN
+        self.fpn_num_blocks = 1
+        self.fpn_expand_ratio = 1.0
+        self.hidden_dim = 64
+        self.en_num_heads = 8
+        self.en_num_layers = 1
+        self.en_ffn_dim = 512
+        ## Transformer Decoder
+        self.de_num_layers = 3
+        self.de_ffn_dim    = 512
+
+        # ---------------- Data process config ----------------
+        self.aug_type = 'rtdetr'
+        self.box_format = 'xywh'
+        self.normalize_coords = True
+        self.mosaic_prob = 0.0
+        self.mixup_prob  = 0.0
+        self.multi_scale = [0.75, 1.25]
+        ## Pixel mean & std
+        self.pixel_mean = [0., 0., 0.]         # RGB format
+        self.pixel_std  = [255., 255., 255.]   # RGB format
+
+# RT-DETR-Small (not complete yet)
+class RTDetrSConfig(RTDetrBaseConfig):
+    def __init__(self) -> None:
+        super().__init__()
+        # ---------------- Model config ----------------
+        self.width    = 0.50
+        self.depth    = 0.34
+        self.ratio    = 2.0
+        self.out_stride = [8, 16, 32]
+        self.max_stride = 32
+        self.scale      = "s"
+        ## Backbone
+        self.backbone = 'rtcnet'
+        self.bk_act   = 'silu'
+        self.bk_norm  = 'BN'
+        self.bk_depthwise = False
+        self.use_pretrained = True
+        ## Image Encoder - FPN
+        self.fpn_num_blocks = 1
+        self.fpn_expand_ratio = 1.0
+        self.hidden_dim = 128
+        self.en_num_heads = 8
+        self.en_num_layers = 1
+        self.en_ffn_dim = 1024
+        ## Transformer Decoder
+        self.de_num_layers = 3
+        self.de_ffn_dim    = 1024
+
+        # ---------------- Data process config ----------------
+        self.aug_type = 'rtdetr'
+        self.box_format = 'xywh'
+        self.normalize_coords = True
+        self.mosaic_prob = 0.0
+        self.mixup_prob  = 0.0
+        self.multi_scale = [0.75, 1.25]
+        ## Pixel mean & std
+        self.pixel_mean = [0., 0., 0.]         # RGB format
+        self.pixel_std  = [255., 255., 255.]   # RGB format
+
+# RT-DETR-Medium (not complete yet)
+class RTDetrMConfig(RTDetrBaseConfig):
+    def __init__(self) -> None:
+        super().__init__()
+        # ---------------- Model config ----------------
+        self.width    = 0.75
+        self.depth    = 0.67
+        self.ratio    = 1.5
+        self.out_stride = [8, 16, 32]
+        self.max_stride = 32
+        self.scale      = "m"
+        ## Backbone
+        self.backbone = 'rtcnet'
+        self.bk_act   = 'silu'
+        self.bk_norm  = 'BN'
+        self.bk_depthwise = False
+        self.use_pretrained = True
+        ## Image Encoder - FPN
+        self.fpn_num_blocks = 2
+        self.fpn_expand_ratio = 1.0
+        self.hidden_dim = 192
+        self.en_num_heads = 8
+        self.en_num_layers = 1
+        self.en_ffn_dim = 1024
+        ## Transformer Decoder
+        self.de_num_layers = 4
+        self.de_ffn_dim    = 1024
+
+        # ---------------- Data process config ----------------
+        self.aug_type = 'rtdetr'
+        self.box_format = 'xywh'
+        self.normalize_coords = True
+        self.mosaic_prob = 0.0
+        self.mixup_prob  = 0.0
+        self.multi_scale = [0.75, 1.25]
+        ## Pixel mean & std
+        self.pixel_mean = [0., 0., 0.]         # RGB format
+        self.pixel_std  = [255., 255., 255.]   # RGB format
+
+# RT-DETR-Large (not complete yet)
+class RTDetrLConfig(RTDetrBaseConfig):
+    def __init__(self) -> None:
+        super().__init__()
+        # ---------------- Model config ----------------
+        self.width    = 1.0
+        self.depth    = 1.0
+        self.ratio    = 1.0
+        self.out_stride = [8, 16, 32]
+        self.max_stride = 32
+        self.scale      = "l"
+        ## Backbone
+        self.backbone = 'rtcnet'
+        self.bk_act   = 'silu'
+        self.bk_norm  = 'BN'
+        self.bk_depthwise = False
+        self.use_pretrained = True
+        ## Image Encoder - FPN
+        self.fpn_num_blocks = 3
+        self.fpn_expand_ratio = 1.0
+        self.hidden_dim = 256
+        self.en_num_heads = 8
+        self.en_num_layers = 1
+        self.en_ffn_dim = 1024
+        ## Transformer Decoder
+        self.de_num_layers = 6
+        self.de_ffn_dim    = 1024
+
+        # ---------------- Data process config ----------------
+        self.aug_type = 'rtdetr'
+        self.box_format = 'xywh'
+        self.normalize_coords = True
+        self.mosaic_prob = 0.0
+        self.mixup_prob  = 0.0
+        self.multi_scale = [0.75, 1.25]
+        ## Pixel mean & std
+        self.pixel_mean = [0., 0., 0.]         # RGB format
+        self.pixel_std  = [255., 255., 255.]   # RGB format

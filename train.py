@@ -168,21 +168,6 @@ def train():
     if args.distributed:
         dist.barrier()
 
-    ## Build DDP model
-    if args.distributed:
-        model = DDP(model, device_ids=[args.gpu], find_unused_parameters=args.find_unused_parameters)
-        if args.sybn:
-            print('use SyncBatchNorm ...')
-            model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
-        model_without_ddp = model.module
-
-    if args.distributed:
-        dist.barrier()
-
-    # ---------------------------- Build Trainer ----------------------------
-    trainer = build_trainer(args, cfg, device, model, criterion, train_transform, val_transform, dataset, train_loader, evaluator)
-
-    # --------------------------------- Train: Start ---------------------------------
     ## Eval before training
     if args.eval_first and distributed_utils.is_main_process():
         # to check whether the evaluator can work
@@ -190,9 +175,22 @@ def train():
         trainer.eval(model_eval)
         exit(0)
 
-    ## Satrt Training
+    ## Build DDP model
+    if args.distributed:
+        model = DDP(model, device_ids=[args.gpu], find_unused_parameters=args.find_unused_parameters)
+        model_without_ddp = model.module
+        if args.sybn:
+            print('use SyncBatchNorm ...')
+            model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
+
+    if args.distributed:
+        dist.barrier()
+
+    # ---------------------------- Build Trainer ----------------------------
+    trainer = build_trainer(args, cfg, device, model, criterion, train_transform, val_transform, dataset, train_loader, evaluator)
+
+    # ---------------------------- Train pipeline ----------------------------
     trainer.train(model)
-    # --------------------------------- Train: End ---------------------------------
 
     # Empty cache after train loop
     del trainer

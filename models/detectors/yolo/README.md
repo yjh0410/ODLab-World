@@ -1,13 +1,13 @@
 # YOLO:
 
-|  Model  |  Batch | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>val<br>0.5 | FLOPs<br><sup>(G) | Params<br><sup>(M) | Weight | Logs |
+|  Model  |  Batch | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>val<br>0.5 | FLOPs<br><sup>(G) | Params<br><sup>(M) | ckpt | logs |
 |---------|--------|-------|------------------------|-------------------|-------------------|--------------------|--------|------|
-| YOLO-P  | 8xb16  |  640  |                        |                   |                   |                    |  |
-| YOLO-N  | 8xb16  |  640  |                        |                   |                   |                    |  |
-| YOLO-S  | 8xb16  |  640  |                        |                   |                   |                    |  |
-| YOLO-M  | 8xb16  |  640  |                        |                   |                   |                    |  |
-| YOLO-L  | 8xb16  |  640  |                        |                   |                   |                    |  |
-| YOLO-X  | 8xb16  |  640  |                        |                   |                   |                    |  |
+| YOLO-P  | 8xb16  |  640  |                        |                   |                   |                    |  |  |
+| YOLO-N  | 8xb16  |  640  |                        |                   |                   |                    |  |  |
+| YOLO-S  | 8xb16  |  640  |                        |                   |                   |                    |  |  |
+| YOLO-M  | 8xb16  |  640  |                        |                   |                   |                    |  |  |
+| YOLO-L  | 8xb16  |  640  |                        |                   |                   |                    |  |  |
+| YOLO-X  | 8xb16  |  640  |                        |                   |                   |                    |  |  |
 
 
 ## Train YOLO
