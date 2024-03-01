@@ -114,7 +114,7 @@ class YOLOBaseConfig(object):
         self.use_ablu = True
         self.affine_params = {
             'degrees': 0.0,
-            'translate': 0.2,
+            'translate': 0.1,
             'scale': [0.1, 2.0],
             'shear': 0.0,
             'perspective': 0.0,
@@ -199,6 +199,16 @@ class YOLOsConfig(YOLOBaseConfig):
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.0
+        self.affine_params = {
+            'degrees': 0.0,
+            'translate': 0.1,
+            'scale': [0.5, 1.5],
+            'shear': 0.0,
+            'perspective': 0.0,
+            'hsv_h': 0.015,
+            'hsv_s': 0.7,
+            'hsv_v': 0.4,
+        }
 
 # YOLO-M
 class YOLOmConfig(YOLOBaseConfig):
