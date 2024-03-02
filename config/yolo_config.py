@@ -96,7 +96,7 @@ class YOLOBaseConfig(object):
         self.lr_scheduler = "linear"
         self.max_epoch    = 500
         self.eval_epoch   = 10
-        self.no_aug_epoch = 10
+        self.no_aug_epoch = 15
 
         # ---------------- Data process config ----------------
         self.aug_type = 'yolo'
