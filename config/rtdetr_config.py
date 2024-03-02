@@ -90,6 +90,7 @@ class RTDetrBaseConfig(object):
         self.optimizer = 'adamw'
         self.per_image_lr = 0.0001 / 16
         self.base_lr   = None      # base_lr = per_image_lr * batch_size
+        self.min_lr    = 0.0
         self.backbone_lr_ratio = 0.1
         self.momentum  = None
         self.weight_decay = 0.0001

@@ -45,7 +45,7 @@ def build_lr_scheduler(cfg, optimizer, resume=None):
         print('--lr_epoch: {}'.format(cfg.lr_epoch))
         lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer=optimizer, milestones=cfg.lr_epoch)
     elif cfg.lr_scheduler == 'cosine':
-        pass
+        lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=cfg.max_epoch, eta_min=cfg.min_lr)
         
     if resume is not None and resume.lower() != "none":
         checkpoint = torch.load(resume)
@@ -56,7 +56,6 @@ def build_lr_scheduler(cfg, optimizer, resume=None):
             lr_scheduler.load_state_dict(checkpoint_state_dict)
 
     return lr_scheduler
-
 
 def build_lambda_lr_scheduler(cfg, optimizer):
     """Build learning rate scheduler from cfg file."""

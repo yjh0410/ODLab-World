@@ -67,6 +67,7 @@ class YoloTrainer(object):
 
         # ---------------------------- Build Optimizer ----------------------------
         cfg.base_lr = cfg.per_image_lr * args.batch_size
+        cfg.min_lr  = cfg.base_lr * cfg.min_lr_ratio
         self.optimizer, self.start_epoch = build_yolo_optimizer(cfg, model, args.resume)
 
         # ---------------------------- Build LR Scheduler ----------------------------
@@ -355,6 +356,7 @@ class RTDetrTrainer(object):
 
         # ---------------------------- Build Optimizer ----------------------------
         cfg.base_lr = cfg.per_image_lr * args.batch_size
+        cfg.min_lr  = cfg.base_lr * cfg.min_lr_ratio
         self.optimizer, self.start_epoch = build_rtdetr_optimizer(cfg, model, args.resume)
 
         # ---------------------------- Build LR Scheduler ----------------------------
