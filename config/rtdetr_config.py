@@ -203,17 +203,6 @@ class RTDetrNConfig(RTDetrBaseConfig):
         self.de_num_layers = 3
         self.de_ffn_dim    = 512
 
-        # ---------------- Data process config ----------------
-        self.aug_type = 'rtdetr'
-        self.box_format = 'xywh'
-        self.normalize_coords = True
-        self.mosaic_prob = 0.0
-        self.mixup_prob  = 0.0
-        self.multi_scale = [0.75, 1.25]
-        ## Pixel mean & std
-        self.pixel_mean = [0., 0., 0.]         # RGB format
-        self.pixel_std  = [255., 255., 255.]   # RGB format
-
 # RT-DETR-Small (not complete yet)
 class RTDetrSConfig(RTDetrBaseConfig):
     def __init__(self) -> None:
@@ -241,17 +230,6 @@ class RTDetrSConfig(RTDetrBaseConfig):
         ## Transformer Decoder
         self.de_num_layers = 3
         self.de_ffn_dim    = 1024
-
-        # ---------------- Data process config ----------------
-        self.aug_type = 'rtdetr'
-        self.box_format = 'xywh'
-        self.normalize_coords = True
-        self.mosaic_prob = 0.0
-        self.mixup_prob  = 0.0
-        self.multi_scale = [0.75, 1.25]
-        ## Pixel mean & std
-        self.pixel_mean = [0., 0., 0.]         # RGB format
-        self.pixel_std  = [255., 255., 255.]   # RGB format
 
 # RT-DETR-Medium (not complete yet)
 class RTDetrMConfig(RTDetrBaseConfig):
@@ -281,17 +259,6 @@ class RTDetrMConfig(RTDetrBaseConfig):
         self.de_num_layers = 4
         self.de_ffn_dim    = 1024
 
-        # ---------------- Data process config ----------------
-        self.aug_type = 'rtdetr'
-        self.box_format = 'xywh'
-        self.normalize_coords = True
-        self.mosaic_prob = 0.0
-        self.mixup_prob  = 0.0
-        self.multi_scale = [0.75, 1.25]
-        ## Pixel mean & std
-        self.pixel_mean = [0., 0., 0.]         # RGB format
-        self.pixel_std  = [255., 255., 255.]   # RGB format
-
 # RT-DETR-Large (not complete yet)
 class RTDetrLConfig(RTDetrBaseConfig):
     def __init__(self) -> None:
@@ -319,14 +286,3 @@ class RTDetrLConfig(RTDetrBaseConfig):
         ## Transformer Decoder
         self.de_num_layers = 6
         self.de_ffn_dim    = 1024
-
-        # ---------------- Data process config ----------------
-        self.aug_type = 'rtdetr'
-        self.box_format = 'xywh'
-        self.normalize_coords = True
-        self.mosaic_prob = 0.0
-        self.mixup_prob  = 0.0
-        self.multi_scale = [0.75, 1.25]
-        ## Pixel mean & std
-        self.pixel_mean = [0., 0., 0.]         # RGB format
-        self.pixel_std  = [255., 255., 255.]   # RGB format
