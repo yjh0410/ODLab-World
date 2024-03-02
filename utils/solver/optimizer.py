@@ -24,7 +24,7 @@ def build_yolo_optimizer(cfg, model, resume=None):
     elif cfg.optimizer == 'adamw':
         optimizer = torch.optim.AdamW(g[2], lr=cfg.base_lr, weight_decay=0.0)
     elif cfg.optimizer == 'sgd':
-        optimizer = torch.optim.SGD(g[2], lr=cfg.base_lr, momentum=cfg.momentum, nesterov=True)
+        optimizer = torch.optim.SGD(g[2], lr=cfg.base_lr, momentum=cfg.momentum, weight_decay=0.0)
     else:
         raise NotImplementedError('Optimizer {} not implemented.'.format(cfg.optimizer))
 
