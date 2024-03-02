@@ -6,6 +6,7 @@ def build_yolo_optimizer(cfg, model, resume=None):
     print('==============================')
     print('Optimizer: {}'.format(cfg.optimizer))
     print('--base lr: {}'.format(cfg.base_lr))
+    print('--min_lr:  {}'.format(cfg.min_lr))
     print('--momentum: {}'.format(cfg.momentum))
     print('--weight_decay: {}'.format(cfg.weight_decay))
 
