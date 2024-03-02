@@ -85,7 +85,7 @@ class YOLOBaseConfig(object):
         self.per_image_lr = 0.001 / 64
         self.base_lr      = None      # base_lr = per_image_lr * batch_size
         self.min_lr_ratio = 0.01      # min_lr  = base_lr * min_lr_ratio
-        self.momentum     = 0.9
+        self.momentum     = None
         self.weight_decay = 0.05
         self.clip_max_norm   = -1.
         self.warmup_bias_lr  = 0.1
