@@ -169,7 +169,6 @@ class YOLOnConfig(YOLOBaseConfig):
         self.depth = 0.34
         self.ratio = 2.0
         self.scale = "n"
-        self.use_pretrained = True
 
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
@@ -194,7 +193,6 @@ class YOLOsConfig(YOLOBaseConfig):
         self.depth = 0.34
         self.ratio = 2.0
         self.scale = "s"
-        self.use_pretrained = True
 
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
