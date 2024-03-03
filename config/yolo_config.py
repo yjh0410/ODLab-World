@@ -3,22 +3,22 @@
 
 def build_yolo_config(args):
     if   args.model == 'yolo_p':
-        return YOLOpConfig()
+        return YoloPConfig()
     elif args.model == 'yolo_n':
-        return YOLOnConfig()
+        return YoloNConfig()
     elif args.model == 'yolo_s':
-        return YOLOsConfig()
+        return YoloSConfig()
     elif args.model == 'yolo_m':
-        return YOLOmConfig()
+        return YoloMConfig()
     elif args.model == 'yolo_l':
-        return YOLOlConfig()
+        return YoloLConfig()
     elif args.model == 'yolo_x':
-        return YOLOxConfig()
+        return YoloXConfig()
     else:
         raise NotImplementedError("No config for model: {}".format(args.model))
     
 # YOLO-Base config
-class YOLOBaseConfig(object):
+class YoloBaseConfig(object):
     def __init__(self) -> None:
         # ---------------- Model config ----------------
         self.width    = 1.0
@@ -129,7 +129,7 @@ class YOLOBaseConfig(object):
             print("{} : {}".format(k, v))
 
 # YOLO-P config
-class YOLOpConfig(YOLOBaseConfig):
+class YoloPConfig(YoloBaseConfig):
     def __init__(self) -> None:
         # ---------------- Model config ----------------
         self.width = 0.25
@@ -161,7 +161,7 @@ class YOLOpConfig(YOLOBaseConfig):
         }
 
 # YOLO-N
-class YOLOnConfig(YOLOBaseConfig):
+class YoloNConfig(YoloBaseConfig):
     def __init__(self) -> None:
         super().__init__()
         # ---------------- Model config ----------------
@@ -185,7 +185,7 @@ class YOLOnConfig(YOLOBaseConfig):
         }
 
 # YOLO-S
-class YOLOsConfig(YOLOBaseConfig):
+class YoloSConfig(YoloBaseConfig):
     def __init__(self) -> None:
         super().__init__()
         # ---------------- Model config ----------------
@@ -199,7 +199,7 @@ class YOLOsConfig(YOLOBaseConfig):
         self.mixup_prob  = 0.0
 
 # YOLO-M
-class YOLOmConfig(YOLOBaseConfig):
+class YoloMConfig(YoloBaseConfig):
     def __init__(self) -> None:
         super().__init__()
         # ---------------- Model config ----------------
@@ -213,7 +213,7 @@ class YOLOmConfig(YOLOBaseConfig):
         self.mixup_prob  = 0.1
 
 # YOLO-L
-class YOLOlConfig(YOLOBaseConfig):
+class YoloLConfig(YoloBaseConfig):
     def __init__(self) -> None:
         super().__init__()
         # ---------------- Model config ----------------
@@ -227,7 +227,7 @@ class YOLOlConfig(YOLOBaseConfig):
         self.mixup_prob  = 0.15
 
 # YOLO-X
-class YOLOxConfig(YOLOBaseConfig):
+class YoloXConfig(YoloBaseConfig):
     def __init__(self) -> None:
         super().__init__()
         # ---------------- Model config ----------------
