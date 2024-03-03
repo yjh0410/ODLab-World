@@ -20,9 +20,13 @@ def box_xyxy_to_cxcywh(x):
 
 def rescale_bboxes(bboxes, origin_size, ratio):
     # rescale bboxes
-    assert isinstance(ratio, List) and len(ratio) == 2
-    bboxes[..., [0, 2]] /= ratio[0]
-    bboxes[..., [1, 3]] /= ratio[1]
+    if isinstance(ratio, float):
+        bboxes /= ratio
+    elif isinstance(ratio, List) and len(ratio) == 2:
+        bboxes[..., [0, 2]] /= ratio[0]
+        bboxes[..., [1, 3]] /= ratio[1]
+    else:
+        raise NotImplementedError("ratio should be a int or List[int, int] type.")
 
     # clip bboxes
     bboxes[..., [0, 2]] = np.clip(bboxes[..., [0, 2]], a_min=0., a_max=origin_size[0])

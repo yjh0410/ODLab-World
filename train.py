@@ -175,13 +175,6 @@ def train():
     if args.distributed:
         dist.barrier()
 
-    ## Eval before training
-    if args.eval_first and distributed_utils.is_main_process():
-        # to check whether the evaluator can work
-        model_eval = model_without_ddp
-        trainer.eval(model_eval)
-        exit(0)
-
     ## Build DDP model
     if args.distributed:
         model = DDP(model, device_ids=[args.gpu], find_unused_parameters=args.find_unused_parameters)
@@ -195,6 +188,13 @@ def train():
 
     # ---------------------------- Build Trainer ----------------------------
     trainer = build_trainer(args, cfg, device, model, model_ema, criterion, train_transform, val_transform, dataset, train_loader, evaluator)
+
+    ## Eval before training
+    if args.eval_first and distributed_utils.is_main_process():
+        # to check whether the evaluator can work
+        model_eval = model_without_ddp
+        trainer.eval(model_eval)
+        exit(0)
 
     # ---------------------------- Train pipeline ----------------------------
     trainer.train(model)
