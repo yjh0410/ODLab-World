@@ -104,7 +104,7 @@ class YOLOBaseConfig(object):
         self.normalize_coords = False
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.15
-        self.multi_scale = [0.5, 1.5]   # multi scale: [img_size * 0.5, img_size * 1.5]
+        self.multi_scale = [0.5, 1.25]   # multi scale: [img_size * 0.5, img_size * 1.25]
         ## Pixel mean & std
         self.pixel_mean = [0., 0., 0.]
         self.pixel_std  = [255., 255., 255.]

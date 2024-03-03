@@ -153,10 +153,11 @@ class YOLOAugmentation(object):
     def __call__(self, image, target, mosaic=False):
         # --------------- Resize image ---------------
         orig_h, orig_w = image.shape[:2]
-        if not (orig_h == self.img_size and orig_w == self.img_size):
-            image = cv2.resize(image, (self.img_size, self.img_size))
+        ratio = self.img_size / max(orig_h, orig_w)
+        if ratio != 1: 
+            new_shape = (int(round(orig_w * ratio)), int(round(orig_h * ratio)))
+            image = cv2.resize(image, new_shape)
         img_h, img_w = image.shape[:2]
-        ratio = [self.img_size / orig_w, self.img_size / orig_h]
 
         # --------------- Filter bad targets ---------------
         tgt_boxes_wh = target["boxes"][..., 2:] - target["boxes"][..., :2]
@@ -220,7 +221,13 @@ class YOLOAugmentation(object):
                 box_bwbh =  target["boxes"][..., 2:] - target["boxes"][..., :2]
                 target["boxes"] = torch.cat([box_cxcy, box_bwbh], dim=-1)
 
-        return image, target, ratio
+
+        # --------------- Pad Image ---------------
+        img_h0, img_w0 = image.shape[1:]
+        pad_image = torch.zeros([image.size(0), self.img_size, self.img_size]).float()
+        pad_image[:, :img_h0, :img_w0] = image
+
+        return pad_image, target, ratio
 
 ## YOLO-style Transform for Eval
 class YOLOBaseTransform(object):
@@ -242,10 +249,11 @@ class YOLOBaseTransform(object):
     def __call__(self, image, target=None, mosaic=False):
         # --------------- Resize image ---------------
         orig_h, orig_w = image.shape[:2]
-        if not (orig_h == self.img_size and orig_w == self.img_size):
-            image = cv2.resize(image, (self.img_size, self.img_size))
+        ratio = self.img_size / max(orig_h, orig_w)
+        if ratio != 1: 
+            new_shape = (int(round(orig_w * ratio)), int(round(orig_h * ratio)))
+            image = cv2.resize(image, new_shape)
         img_h, img_w = image.shape[:2]
-        ratio = [self.img_size / orig_w, self.img_size / orig_h]
 
         # --------------- Rescale bboxes ---------------
         if target is not None:
@@ -271,4 +279,16 @@ class YOLOBaseTransform(object):
                 box_bwbh =  target["boxes"][..., 2:] - target["boxes"][..., :2]
                 target["boxes"] = torch.cat([box_cxcy, box_bwbh], dim=-1)
 
-        return image, target, ratio
+        # --------------- Pad image ---------------
+        img_h0, img_w0 = image.shape[1:]
+        dh = img_h0 % self.max_stride
+        dw = img_w0 % self.max_stride
+        dh = dh if dh == 0 else self.max_stride - dh
+        dw = dw if dw == 0 else self.max_stride - dw
+        
+        pad_img_h = img_h0 + dh
+        pad_img_w = img_w0 + dw
+        pad_image = torch.zeros([image.size(0), pad_img_h, pad_img_w]).float()
+        pad_image[:, :img_h0, :img_w0] = image
+
+        return pad_image, target, ratio

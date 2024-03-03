@@ -31,8 +31,11 @@ class MosaicAugment(object):
             labels_i = target_i["labels"]
             orig_h, orig_w, _ = img_i.shape
 
-            # ------------------ Resize ------------------
-            img_i = cv2.resize(img_i, (self.img_size, self.img_size))
+            # ------------------ Keep ratio Resize ------------------
+            r = self.img_size / max(orig_h, orig_w)
+            if r != 1: 
+                interp = cv2.INTER_LINEAR if (self.is_train or r > 1) else cv2.INTER_AREA
+                img_i = cv2.resize(img_i, (int(orig_w * r), int(orig_h * r)), interpolation=interp)
             h, w, _ = img_i.shape
 
             # ------------------ Create mosaic image ------------------
