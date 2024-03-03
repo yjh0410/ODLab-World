@@ -20,7 +20,7 @@ pretrained_urls = {
     'resnet101': ResNet101_Weights,
     # RTCNet series
     'rtcnet_p': None,
-    'rtcnet_n': None,
+    'rtcnet_n': "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/rtcnet_n_in1k.pth",
     'rtcnet_s': None,
     'rtcnet_m': None,
     'rtcnet_l': None,
