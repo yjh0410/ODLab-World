@@ -76,24 +76,24 @@ class YoloBaseConfig(object):
 
         # ---------------- ModelEMA config ----------------
         self.use_ema = True
-        self.ema_decay = 0.9999
+        self.ema_decay = 0.9998
         self.ema_tau   = 2000
 
         # ---------------- Optimizer config ----------------
         self.trainer      = 'yolo'
-        self.optimizer    = 'sgd'
-        self.per_image_lr = 0.01 / 64
+        self.optimizer    = 'adamw'
+        self.per_image_lr = 0.001 / 64
         self.base_lr      = None      # base_lr = per_image_lr * batch_size
-        self.min_lr_ratio = 0.05      # min_lr  = base_lr * min_lr_ratio
+        self.min_lr_ratio = 0.01      # min_lr  = base_lr * min_lr_ratio
         self.momentum     = 0.9
-        self.weight_decay = 0.0005
+        self.weight_decay = 0.05
         self.clip_max_norm   = -1.
         self.warmup_bias_lr  = 0.1
         self.warmup_momentum = 0.8
 
         # ---------------- Lr Scheduler config ----------------
         self.warmup_epoch = 3
-        self.lr_scheduler = "cosine"
+        self.lr_scheduler = "linear"
         self.max_epoch    = 500
         self.eval_epoch   = 10
         self.no_aug_epoch = 20
