@@ -76,17 +76,17 @@ class YoloBaseConfig(object):
 
         # ---------------- ModelEMA config ----------------
         self.use_ema = True
-        self.ema_decay = 0.9998
+        self.ema_decay = 0.9999
         self.ema_tau   = 2000
 
         # ---------------- Optimizer config ----------------
         self.trainer      = 'yolo'
-        self.optimizer    = 'adamw'
-        self.per_image_lr = 0.001 / 64
+        self.optimizer    = 'sgd'
+        self.per_image_lr = 0.01 / 64
         self.base_lr      = None      # base_lr = per_image_lr * batch_size
         self.min_lr_ratio = 0.01      # min_lr  = base_lr * min_lr_ratio
         self.momentum     = None
-        self.weight_decay = 0.05
+        self.weight_decay = 0.0005
         self.clip_max_norm   = -1.
         self.warmup_bias_lr  = 0.1
         self.warmup_momentum = 0.8
@@ -104,7 +104,7 @@ class YoloBaseConfig(object):
         self.normalize_coords = False
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.15
-        self.multi_scale = [0.5, 1.25]   # multi scale: [img_size * 0.5, img_size * 1.25]
+        self.multi_scale = [0.5, 1.5]   # multi scale: [img_size * 0.5, img_size * 1.5]
         ## Pixel mean & std
         self.pixel_mean = [0., 0., 0.]
         self.pixel_std  = [255., 255., 255.]
@@ -114,7 +114,7 @@ class YoloBaseConfig(object):
         self.use_ablu = True
         self.affine_params = {
             'degrees': 0.0,
-            'translate': 0.2,
+            'translate': 0.1,
             'scale': [0.1, 2.0],
             'shear': 0.0,
             'perspective': 0.0,
@@ -197,6 +197,16 @@ class YoloSConfig(YoloBaseConfig):
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.0
+        self.affine_params = {
+            'degrees': 0.0,
+            'translate': 0.1,
+            'scale': [0.5, 1.5],
+            'shear': 0.0,
+            'perspective': 0.0,
+            'hsv_h': 0.015,
+            'hsv_s': 0.7,
+            'hsv_v': 0.4,
+        }
 
 # YOLO-M
 class YoloMConfig(YoloBaseConfig):
