@@ -19,7 +19,6 @@ pretrained_urls = {
 
 
 # ---------------------------- Basic functions ----------------------------
-## ELAN-CSPNet
 class YoloBackbone(nn.Module):
     def __init__(self, cfg):
         super(YoloBackbone, self).__init__()
