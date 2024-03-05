@@ -20,6 +20,8 @@ def build_rtdetr_config(args):
         return RTDetrMConfig()
     elif args.model == "rtdetr_l":
         return RTDetrLConfig()
+    elif args.model == "rtdetr_x":
+        return RTDetrXConfig()
     raise NotImplementedError("No config for model: {}".format(args.model))   
  
 # rtdetr-Base config
