@@ -12,7 +12,7 @@ from .basic_modules.dn_compoments import get_contrastive_denoising_training_grou
 
 # ----------------- Dencoder for Detection task -----------------
 ## RTDETR's Transformer for Detection task
-class RTDETRTransformer(nn.Module):
+class RTDetrTransformer(nn.Module):
     def __init__(self,
                  # basic parameters
                  in_dims        :List = [256, 512, 1024],
@@ -20,7 +20,6 @@ class RTDETRTransformer(nn.Module):
                  strides        :List = [8, 16, 32],
                  num_classes    :int  = 80,
                  num_queries    :int  = 300,
-                 pos_embed_type :str  = 'sine',
                  # transformer parameters
                  num_heads      :int   = 8,
                  num_layers     :int   = 1,
@@ -43,7 +42,6 @@ class RTDETRTransformer(nn.Module):
         self.in_dims = in_dims
         self.strides = strides
         self.num_queries = num_queries
-        self.pos_embed_type = pos_embed_type
         self.num_classes = num_classes
         self.eps = 1e-2
         self.aux_loss = aux_loss
@@ -273,3 +271,34 @@ class RTDETRTransformer(nn.Module):
                 out['dn_meta'] = dn_meta
 
         return out
+
+
+## RTDETR's Transformer for Instance Segmentation task (not complete yet)
+class MaskRTDetrTransformer(RTDetrTransformer):
+    def __init__(self,
+                 # basic parameters
+                 in_dims        :List = [256, 512, 1024],
+                 hidden_dim     :int  = 256,
+                 strides        :List = [8, 16, 32],
+                 num_classes    :int  = 80,
+                 num_queries    :int  = 300,
+                 # transformer parameters
+                 num_heads      :int   = 8,
+                 num_layers     :int   = 1,
+                 num_levels     :int   = 3,
+                 num_points     :int   = 4,
+                 ffn_dim        :int   = 1024,
+                 dropout        :float = 0.1,
+                 act_type       :str   = "relu",
+                 return_intermediate :bool = False,
+                 # Denoising parameters
+                 num_denoising       :int  = 100,
+                 label_noise_ratio   :float = 0.5,
+                 box_noise_scale     :float = 1.0,
+                 learnt_init_query   :bool  = False,
+                 aux_loss            :bool  = True
+                 ):
+        super().__init__()
+
+    def forward(self, feats, targets=None):
+        return

@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 from .rtdetr_encoder import ImageEncoder
-from .rtdetr_decoder import RTDETRTransformer
+from .rtdetr_decoder import RTDetrTransformer
 
 from .basic_modules.nms_ops import multiclass_nms
 
@@ -32,7 +32,7 @@ class RTDETR(nn.Module):
         ## Image encoder
         self.image_encoder = ImageEncoder(cfg)
         ## Detect decoder
-        self.detect_decoder = RTDETRTransformer(in_dims             = self.image_encoder.fpn_dims,
+        self.detect_decoder = RTDetrTransformer(in_dims             = self.image_encoder.fpn_dims,
                                                 hidden_dim          = cfg.hidden_dim,
                                                 strides             = cfg.out_stride,
                                                 num_classes         = cfg.num_classes,

@@ -7,7 +7,7 @@ from .yolo_backbone import YoloBackbone
 from .yolo_neck     import SPPF
 from .yolo_pafpn    import YoloPaFPN
 from .yolo_head     import YoloDetHead
-from .yolo_pred     import YoloPredLayer
+from .yolo_pred     import YoloDetPredLayer
 
 # --------------- External components ---------------
 from utils.misc import multiclass_nms
@@ -36,7 +36,7 @@ class Yolo(nn.Module):
         self.neck     = SPPF(cfg, self.backbone.feat_dims[-1], self.backbone.feat_dims[-1])
         self.fpn      = YoloPaFPN(cfg, self.backbone.feat_dims)
         self.head     = YoloDetHead(cfg, self.fpn.out_dims)
-        self.pred     = YoloPredLayer(cfg, self.head.cls_head_dim, self.head.reg_head_dim)
+        self.pred     = YoloDetPredLayer(cfg, self.head.cls_head_dim, self.head.reg_head_dim)
 
     def post_process(self, cls_preds, box_preds):
         """

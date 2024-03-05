@@ -19,14 +19,16 @@ coco_class_labels = ('person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus'
 class COCODataset(Dataset):
     def __init__(self, 
                  cfg,
-                 data_dir     :str = None, 
-                 image_set    :str = 'train2017',
-                 transform    = None,
-                 is_train     :bool =False,
+                 data_dir  :str = None, 
+                 image_set :str = 'train2017',
+                 transform = None,
+                 is_train  :bool = False,
+                 use_mask  :bool = False,
                  ):
         # ----------- Basic parameters -----------
         self.image_set = image_set
         self.is_train  = is_train
+        self.use_mask  = use_mask
         self.num_classes = 80
         # ----------- Path parameters -----------
         self.data_dir = data_dir
