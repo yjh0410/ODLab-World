@@ -36,12 +36,16 @@ def build_yolo_optimizer(cfg, model, resume=None):
 
     start_epoch = 0
     if resume and resume != 'None':
-        print('keep training: ', resume)
         checkpoint = torch.load(resume)
         # checkpoint state dict
-        checkpoint_state_dict = checkpoint.pop("optimizer")
-        optimizer.load_state_dict(checkpoint_state_dict)
-        start_epoch = checkpoint.pop("epoch") + 1
+        try:
+            checkpoint_state_dict = checkpoint.pop("optimizer")
+            print('Load optimizer from the checkpoint: ', resume)
+            optimizer.load_state_dict(checkpoint_state_dict)
+            start_epoch = checkpoint.pop("epoch") + 1
+            del checkpoint, checkpoint_state_dict
+        except:
+            print("No optimzier in the given checkpoint.")
                                                         
     return optimizer, start_epoch
 

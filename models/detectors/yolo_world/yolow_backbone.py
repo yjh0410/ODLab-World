@@ -2,26 +2,15 @@ import torch
 import torch.nn as nn
 
 try:
-    from .yolo_basic import BasicConv, ELANLayer
+    from .yolow_basic import BasicConv, ELANLayer
 except:
-    from  yolo_basic import BasicConv, ELANLayer
+    from  yolow_basic import BasicConv, ELANLayer
 
 
-# IN1K pretrained weight
-pretrained_urls = {
-    'p': None,
-    'n': None,
-    's': None,
-    'm': None,
-    'l': None,
-    'x': None,
-}
-
-
-# ---------------------------- Basic functions ----------------------------
-class YoloBackbone(nn.Module):
+# -------------------- Vision Backbone -----------------------
+class YolowVisionBackbone(nn.Module):
     def __init__(self, cfg):
-        super(YoloBackbone, self).__init__()
+        super(YolowVisionBackbone, self).__init__()
         # ------------------ Basic setting ------------------
         self.model_scale = cfg.scale
         self.feat_dims = [round(64  * cfg.width),
@@ -95,10 +84,6 @@ class YoloBackbone(nn.Module):
         # Initialize all layers
         self.init_weights()
         
-        # Load imagenet pretrained weight
-        if cfg.use_pretrained:
-            self.load_pretrained()
-
     def init_weights(self):
         """Initialize the parameters."""
         for m in self.modules():
@@ -106,31 +91,6 @@ class YoloBackbone(nn.Module):
                 # In order to be consistent with the source code,
                 # reset the Conv2d initialization parameters
                 m.reset_parameters()
-
-    def load_pretrained(self):
-        url = pretrained_urls[self.model_scale]
-        if url is not None:
-            print('Loading backbone pretrained weight from : {}'.format(url))
-            # checkpoint state dict
-            checkpoint = torch.hub.load_state_dict_from_url(
-                url=url, map_location="cpu", check_hash=True)
-            checkpoint_state_dict = checkpoint.pop("model")
-            # model state dict
-            model_state_dict = self.state_dict()
-            # check
-            for k in list(checkpoint_state_dict.keys()):
-                if k in model_state_dict:
-                    shape_model = tuple(model_state_dict[k].shape)
-                    shape_checkpoint = tuple(checkpoint_state_dict[k].shape)
-                    if shape_model != shape_checkpoint:
-                        checkpoint_state_dict.pop(k)
-                else:
-                    checkpoint_state_dict.pop(k)
-                    print('Unused key: ', k)
-            # load the weight
-            self.load_state_dict(checkpoint_state_dict)
-        else:
-            print('No pretrained weight for model scale: {}.'.format(self.model_scale))
 
     def forward(self, x):
         c1 = self.layer_1(x)
@@ -142,43 +102,23 @@ class YoloBackbone(nn.Module):
 
         return outputs
 
-
-# ---------------------------- Functions ----------------------------
-## build Yolo's Backbone
-def build_backbone(cfg): 
+def build_vision_backbone(cfg): 
     # model
-    backbone = YoloBackbone(cfg)
+    backbone = YolowVisionBackbone(cfg)
         
     return backbone
 
 
-if __name__ == '__main__':
-    import time
-    from thop import profile
-    class BaseConfig(object):
-        def __init__(self) -> None:
-            self.bk_act = 'silu'
-            self.bk_norm = 'BN'
-            self.bk_depthwise = False
-            self.width = 1.0
-            self.depth = 1.0
-            self.ratio = 1.0
-            self.scale = "n"
-            self.use_pretrained = True
+# -------------------- Prompt Backbone -----------------------
+class YolowPromptBackbone(nn.Module):
+    def __init__(self, cfg):
+        super(YolowPromptBackbone, self).__init__()
 
-    cfg = BaseConfig()
-    model = build_backbone(cfg)
-    x = torch.randn(1, 3, 640, 640)
-    t0 = time.time()
-    outputs = model(x)
-    t1 = time.time()
-    print('Time: ', t1 - t0)
-    for out in outputs:
-        print(out.shape)
+    def forward(self, x):
+        return
 
-    x = torch.randn(1, 3, 640, 640)
-    print('==============================')
-    flops, params = profile(model, inputs=(x, ), verbose=False)
-    print('==============================')
-    print('GFLOPs : {:.2f}'.format(flops / 1e9 * 2))
-    print('Params : {:.2f} M'.format(params / 1e6))
+def build_prompt_backbone(cfg): 
+    # model
+    backbone = YolowPromptBackbone(cfg)
+        
+    return backbone

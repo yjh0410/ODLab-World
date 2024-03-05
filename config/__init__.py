@@ -6,10 +6,10 @@ def build_config(args):
     print('==============================')
     print('Model: {} ...'.format(args.model.upper()))
     # YOLOv1
-    if args.model in ['yolo_p', 'yolo_n', 'yolo_s', 'yolo_m', 'yolo_l', 'yolo_x']:
+    if 'yolo' in args.model:
         cfg = build_yolo_config(args)
     # RT-DETR
-    elif args.model in ['rtdetr_r18', 'rtdetr_r34', 'rtdetr_r50', 'rtdetr_r50x', 'rtdetr_r101']:
+    elif 'rtdetr' in args.model:
         cfg = build_rtdetr_config(args)
     else:
         raise NotImplementedError("Unknown model config: {}".format(args.model))

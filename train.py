@@ -178,10 +178,10 @@ def train():
     ## Build DDP model
     if args.distributed:
         model = DDP(model, device_ids=[args.gpu], find_unused_parameters=args.find_unused_parameters)
-        model_without_ddp = model.module
         if args.sybn:
             print('use SyncBatchNorm ...')
             model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
+        model_without_ddp = model.module
 
     if args.distributed:
         dist.barrier()
@@ -194,7 +194,7 @@ def train():
         # to check whether the evaluator can work
         model_eval = model_without_ddp
         trainer.eval(model_eval)
-        exit(0)
+        return
 
     # ---------------------------- Train pipeline ----------------------------
     trainer.train(model)

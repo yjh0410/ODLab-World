@@ -39,14 +39,17 @@ def build_model(args, cfg, is_val=False):
 
             model.load_state_dict(checkpoint_state_dict, strict=False)
 
-        # ------------ Keep training from the given weight ------------
+        # ------------ Keep training from the given checkpoint ------------
         if args.resume and args.resume != "None":
-            print('keep training: ', args.resume)
             checkpoint = torch.load(args.resume, map_location='cpu')
             # checkpoint state dict
-            checkpoint_state_dict = checkpoint.pop("model")
-            model.load_state_dict(checkpoint_state_dict)
-            del checkpoint, checkpoint_state_dict
+            try:
+                checkpoint_state_dict = checkpoint.pop("model")
+                print('Load model from the checkpoint: ', args.resume)
+                model.load_state_dict(checkpoint_state_dict)
+                del checkpoint, checkpoint_state_dict
+            except:
+                print("No model in the given checkpoint.")
 
         return model, criterion
 
