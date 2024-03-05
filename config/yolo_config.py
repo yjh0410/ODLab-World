@@ -63,6 +63,7 @@ class YoloBaseConfig(object):
         self.test_topk = 100
         self.test_conf_thresh = 0.2
         self.test_nms_thresh  = 0.5
+        self.max_det = -1
 
         # ---------------- Assignment config ----------------
         ## Matcher

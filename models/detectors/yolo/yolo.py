@@ -30,6 +30,7 @@ class Yolo(nn.Module):
         self.conf_thresh     = cfg.val_conf_thresh if is_val else cfg.test_conf_thresh
         self.nms_thresh      = cfg.val_nms_thresh  if is_val else cfg.test_nms_thresh
         self.no_multi_labels = False if is_val else True
+        self.max_det         = cfg.max_det
         
         # ---------------------- Network Parameters ----------------------
         self.backbone = YoloBackbone(cfg)
@@ -112,6 +113,11 @@ class Yolo(nn.Module):
         # nms
         scores, labels, bboxes = multiclass_nms(
             scores, labels, bboxes, self.nms_thresh, self.num_classes)
+        
+        if self.max_det > 0:
+            scores = scores[:self.max_det]
+            labels = labels[:self.max_det]
+            bboxes = bboxes[:self.max_det]
 
         return bboxes, scores, labels
     
