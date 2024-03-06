@@ -8,7 +8,6 @@ import random
 
 # ----------------- Extra Components -----------------
 from utils import distributed_utils
-from utils.misc import ModelEMA
 from utils.misc import MetricLogger, SmoothedValue
 from utils.vis_tools import vis_data
 
