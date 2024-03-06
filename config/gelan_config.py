@@ -4,8 +4,6 @@
 def build_gelan_config(args):
     if   args.model == 'gelan_c':
         return GElanCConfig()
-    elif args.model == 'gelan_m':
-        return GElanMConfig()
     else:
         raise NotImplementedError("No config for model: {}".format(args.model))
     
@@ -24,7 +22,7 @@ class GElanBaseConfig(object):
         self.bk_down_pooling = True
         self.backbone_feats = {
             "c1": [64],
-            "c2": [128, [128, 64], 256],
+            "c2": [128, [128, 64],  256],
             "c3": [256, [256, 128], 512],
             "c4": [512, [512, 256], 512],
             "c5": [512, [512, 256], 512],
@@ -132,38 +130,6 @@ class GElanBaseConfig(object):
         config_dict = {key: value for key, value in self.__dict__.items() if not key.startswith('__')}
         for k, v in config_dict.items():
             print("{} : {}".format(k, v))
-
-# GELAN-M
-class GElanMConfig(GElanBaseConfig):
-    def __init__(self) -> None:
-        super().__init__()
-        # ---------------- Data process config ----------------
-        self.mosaic_prob = 1.0
-        self.mixup_prob  = 0.1
-        ## Backbone
-        self.bk_down_pooling = False
-        self.backbone_feats = {
-            "c1": [48],
-            "c2": [96,  [96, 48],   192],
-            "c3": [192, [192, 96],  384],
-            "c4": [384, [384, 192], 384],
-            "c5": [384, [384, 192], 384],
-        }
-        self.backbone_depth = 1
-        ## Neck
-        self.spp_inter_dim     = 192
-        self.spp_out_dim       = 384
-        ## FPN
-        self.fpn_down_pooling = False
-        self.fpn_depth    = 1
-        self.fpn_feats_td = {
-            "p4": [[384, 192], 384],
-            "p3": [[192, 96], 192],
-        }
-        self.fpn_feats_bu = {
-            "p4": [[384, 192], 384],
-            "p5": [[384, 192], 384],
-        }
 
 # GELAN-C
 class GElanCConfig(GElanBaseConfig):
