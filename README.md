@@ -205,7 +205,7 @@ For example:
 
 ```Shell
 cd <ODLab-World>
-python train.py --root path/to/dataset/ -d customed -m yolo_n --resume path/to/checkpoint --eval_first
+python eval.py --root path/to/dataset/ -d customed -m yolo_n --weight path/to/checkpoint
 ```
 
 ## Deployment

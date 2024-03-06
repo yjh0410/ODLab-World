@@ -1,4 +1,5 @@
 # YOLO:
+Our YOLO detector is equal to YOLOv8, including model structure, label assignment and loss function.
 
 |  Model  |  Batch | Scale | AP<sup>val<br>0.5:0.95 | AP<sup>val<br>0.5 | FLOPs<br><sup>(G) | Params<br><sup>(M) | ckpt | logs |
 |---------|--------|-------|------------------------|-------------------|-------------------|--------------------|--------|------|
@@ -9,6 +10,9 @@
 | YOLO-L  | 8xb16  |  640  |                        |                   |                   |                    |  |  |
 | YOLO-X  | 8xb16  |  640  |                        |                   |                   |                    |  |  |
 
+- For training, I replace the `SGD` used in YOLOv8 with the `AdamW` with weight decay of `0.05` and per image's base lr of `0.001 / 64` as the optimizer. I am not good at using the SGD optimizer.
+
+- All the models are trained from the scratch with `500 epoch`, except that `YOLO-P` used the imagenet-1k pretrained weight. Based on our experience, for lightweight detectors that heavily use depthwise convolution, using imagenet-1k pre training weights could significantly improve model performance, while relying solely on the train from scratch strategy on COCO may not be sufficient.
 
 ## Train YOLO
 ### Single GPU
@@ -32,7 +36,7 @@ python test.py --cuda -d coco --root path/to/coco -m yolo_s --weight path/to/yol
 ## Evaluate YOLO
 Taking evaluating YOLO on COCO-val as the example,
 ```Shell
-python train.py --cuda -d coco --root path/to/coco -m yolo_s -bs 16 --fp16 --resume path/to/yolo.pth --eval_first
+python eval.py --cuda -d coco --root path/to/coco -m yolo_s --weight path/to/yolo.pth
 ```
 
 ## Demo
