@@ -343,7 +343,7 @@ def compute_flops(model, img_size, device):
     print('Params : {:.2f} M'.format(params / 1e6))
 
 ## load trained weight
-def load_weight(model, path_to_ckpt, fuse_cbn=False):
+def load_weight(model, path_to_ckpt, fuse_cbn=False, fuse_rep_conv=False):
     # check ckpt file
     if path_to_ckpt is None:
         print('no weight file ...')
@@ -358,6 +358,13 @@ def load_weight(model, path_to_ckpt, fuse_cbn=False):
         model.load_state_dict(checkpoint_state_dict)
 
         print('Finished loading model!')
+
+    # fuse rep conv
+    if fuse_rep_conv:
+        print("Fusing RepConv ...")
+        for m in model.modules():
+            if hasattr(m, 'fuse_convs'):
+                m.fuse_convs()
 
     # fuse conv & bn
     if fuse_cbn:

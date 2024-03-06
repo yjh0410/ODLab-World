@@ -31,12 +31,14 @@ def parse_args():
                         help='build yolo')
     parser.add_argument('--weight', default=None,
                         type=str, help='Trained state_dict file path to open')
-    parser.add_argument('--fuse_conv_bn', action='store_true', default=False,
-                        help='fuse Conv & BN')
     parser.add_argument('-p', '--pretrained', default=None, type=str,
                         help='load pretrained weight')
     parser.add_argument('-r', '--resume', default=None, type=str,
                         help='keep training')
+    parser.add_argument('--fuse_conv_bn', action='store_true', default=False,
+                        help='fuse Conv & BN')
+    parser.add_argument('--fuse_rep_conv', action='store_true', default=False,
+                        help='fuse Conv & BN')
 
     # Data setting
     parser.add_argument('--root', default='/Users/liuhaoran/Desktop/python_work/object-detection/dataset/',
