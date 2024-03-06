@@ -202,7 +202,7 @@ class YoloSConfig(YoloBaseConfig):
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.0
-        self.copy_paste  = 0.0
+        self.copy_paste  = 0.5
 
 # YOLO-M
 class YoloMConfig(YoloBaseConfig):
@@ -217,6 +217,7 @@ class YoloMConfig(YoloBaseConfig):
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.1
+        self.copy_paste  = 0.5
 
 # YOLO-L
 class YoloLConfig(YoloBaseConfig):
@@ -231,6 +232,7 @@ class YoloLConfig(YoloBaseConfig):
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.15
+        self.copy_paste  = 0.5
 
 # YOLO-X
 class YoloXConfig(YoloBaseConfig):
@@ -245,3 +247,4 @@ class YoloXConfig(YoloBaseConfig):
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.2
+        self.copy_paste  = 0.5
