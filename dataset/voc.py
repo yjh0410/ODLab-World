@@ -74,16 +74,19 @@ class VOCDataset(data.Dataset):
         if is_train:
             self.mosaic_prob = cfg.mosaic_prob
             self.mixup_prob  = cfg.mixup_prob
+            self.copy_paste  = cfg.copy_paste
             self.mosaic_augment = None if cfg.mosaic_prob == 0. else MosaicAugment(cfg.train_img_size, cfg.affine_params, is_train)
-            self.mixup_augment  = None if cfg.mixup_prob == 0.  else MixupAugment(cfg.train_img_size)
+            self.mixup_augment  = None if cfg.mixup_prob == 0. and cfg.copy_paste == 0.  else MixupAugment(cfg.train_img_size)
         else:
             self.mosaic_prob = 0.0
             self.mixup_prob  = 0.0
+            self.copy_paste  = 0.0
             self.mosaic_augment = None
             self.mixup_augment  = None
         print('==============================')
         print('use Mosaic Augmentation: {}'.format(self.mosaic_prob))
-        print('use Mixup Augmentation: {}'.format(self.mixup_prob))
+        print('use Mixup Augmentation:  {}'.format(self.mixup_prob))
+        print('use Copy-paste Augmentation: {}'.format(self.copy_paste))
 
     # ------------ Basic dataset function ------------
     def __getitem__(self, index):
@@ -115,13 +118,13 @@ class VOCDataset(data.Dataset):
 
         return image, target
 
-    def load_mixup(self, origin_image, origin_target):
+    def load_mixup(self, origin_image, origin_target, yolox_style=False):
         # ------------ Load a new image & target ------------
         new_index = np.random.randint(0, len(self.ids))
         new_image, new_target = self.load_mosaic(new_index)
             
         # ------------ Mixup augmentation ------------
-        image, target = self.mixup_augment(origin_image, origin_target, new_image, new_target)
+        image, target = self.mixup_augment(origin_image, origin_target, new_image, new_target, yolox_style)
 
         return image, target
     
@@ -154,9 +157,15 @@ class VOCDataset(data.Dataset):
             # load an image and target
             image, target = self.load_image_target(index)
 
-        # MixUp
+        # Yolov5-MixUp
+        mixup = False
         if random.random() < self.mixup_prob:
+            mixup = True
             image, target = self.load_mixup(image, target)
+
+        # Copy-paste (use Yolox-Mixup to approximate copy-paste)
+        if not mixup and random.random() < self.copy_paste:
+            image, target = self.load_mixup(image, target, yolox_style=True)
 
         # augment
         image, target, deltas = self.transform(image, target, mosaic)
@@ -202,6 +211,7 @@ if __name__ == "__main__":
             self.normalize_coords = False
             self.mosaic_prob = 1.0
             self.mixup_prob  = 0.15
+            self.copy_paste  = 0.3
             ## Pixel mean & std
             self.pixel_mean = [0., 0., 0.]
             self.pixel_std  = [255., 255., 255.]
@@ -230,6 +240,7 @@ if __name__ == "__main__":
             self.normalize_coords = False
             self.mosaic_prob = 0.0
             self.mixup_prob  = 0.0
+            self.copy_paste  = 0.0
             ## Pixel mean & std
             self.pixel_mean = [0., 0., 0.]
             self.pixel_std  = [255., 255., 255.]

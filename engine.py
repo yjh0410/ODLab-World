@@ -308,6 +308,12 @@ class YoloTrainer(object):
             self.train_loader.dataset.mixup_prob = 0.
             self.heavy_eval = True
 
+        # close copy-paste augmentation
+        if self.train_loader.dataset.copy_paste > 0.:
+            print(' - Close < Copy-paste Augmentation > ...')
+            self.train_loader.dataset.copy_paste = 0.
+            self.heavy_eval = True
+
 
 class RTDetrTrainer(object):
     def __init__(self,

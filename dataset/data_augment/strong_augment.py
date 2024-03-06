@@ -105,7 +105,85 @@ class MixupAugment(object):
     def __init__(self, img_size) -> None:
         self.img_size = img_size
 
-    def __call__(self, origin_image, origin_target, new_image, new_target):
+    def yolox_mixup_augment(self, origin_image, origin_target, new_image, new_target):
+        jit_factor = random.uniform(0.5, 1.5)
+        FLIP = random.uniform(0, 1) > 0.5
+
+        # resize new image
+        orig_h, orig_w = new_image.shape[:2]
+        cp_scale_ratio = self.img_size / max(orig_h, orig_w)
+        if cp_scale_ratio != 1: 
+            interp = cv2.INTER_LINEAR if cp_scale_ratio > 1 else cv2.INTER_AREA
+            resized_new_img = cv2.resize(
+                new_image, (int(orig_w * cp_scale_ratio), int(orig_h * cp_scale_ratio)), interpolation=interp)
+        else:
+            resized_new_img = new_image
+
+        # pad new image
+        cp_img = np.ones([self.img_size, self.img_size, new_image.shape[2]], dtype=np.uint8) * 114
+        new_shape = (resized_new_img.shape[1], resized_new_img.shape[0])
+        cp_img[:new_shape[1], :new_shape[0]] = resized_new_img
+
+        # resize padded new image
+        cp_img_h, cp_img_w = cp_img.shape[:2]
+        cp_new_shape = (int(cp_img_w * jit_factor),
+                        int(cp_img_h * jit_factor))
+        cp_img = cv2.resize(cp_img, (cp_new_shape[0], cp_new_shape[1]))
+        cp_scale_ratio *= jit_factor
+
+        # flip new image
+        if FLIP:
+            cp_img = cp_img[:, ::-1, :]
+
+        # pad image
+        origin_h, origin_w = cp_img.shape[:2]
+        target_h, target_w = origin_image.shape[:2]
+        padded_img = np.zeros(
+            (max(origin_h, target_h), max(origin_w, target_w), 3), dtype=np.uint8
+        )
+        padded_img[:origin_h, :origin_w] = cp_img
+
+        # crop padded image
+        x_offset, y_offset = 0, 0
+        if padded_img.shape[0] > target_h:
+            y_offset = random.randint(0, padded_img.shape[0] - target_h - 1)
+        if padded_img.shape[1] > target_w:
+            x_offset = random.randint(0, padded_img.shape[1] - target_w - 1)
+        padded_cropped_img = padded_img[
+            y_offset: y_offset + target_h, x_offset: x_offset + target_w
+        ]
+
+        # process target
+        new_boxes = new_target["boxes"]
+        new_labels = new_target["labels"]
+        new_boxes[:, 0::2] = np.clip(new_boxes[:, 0::2] * cp_scale_ratio, 0, origin_w)
+        new_boxes[:, 1::2] = np.clip(new_boxes[:, 1::2] * cp_scale_ratio, 0, origin_h)
+        if FLIP:
+            new_boxes[:, 0::2] = (
+                origin_w - new_boxes[:, 0::2][:, ::-1]
+            )
+        new_boxes[:, 0::2] = np.clip(
+            new_boxes[:, 0::2] - x_offset, 0, target_w
+        )
+        new_boxes[:, 1::2] = np.clip(
+            new_boxes[:, 1::2] - y_offset, 0, target_h
+        )
+
+        # mixup target
+        mixup_boxes = np.concatenate([new_boxes, origin_target['boxes']], axis=0)
+        mixup_labels = np.concatenate([new_labels, origin_target['labels']], axis=0)
+        mixup_target = {
+            'boxes': mixup_boxes,
+            'labels': mixup_labels
+        }
+
+        # mixup images
+        origin_image = origin_image.astype(np.float32)
+        origin_image = 0.5 * origin_image + 0.5 * padded_cropped_img.astype(np.float32)
+
+        return origin_image.astype(np.uint8), mixup_target
+            
+    def yolo_mixup_augment(self, origin_image, origin_target, new_image, new_target):
         if origin_image.shape[:2] != new_image.shape[:2]:
             img_size = max(new_image.shape[:2])
             # origin_image is not a mosaic image
@@ -139,3 +217,9 @@ class MixupAugment(object):
         }
         
         return mixup_image, mixup_target
+
+    def __call__(self, origin_image, origin_target, new_image, new_target, yolox_style=False):
+        if yolox_style:
+            return self.yolox_mixup_augment(origin_image, origin_target, new_image, new_target)
+        else:
+            return self.yolo_mixup_augment(origin_image, origin_target, new_image, new_target)
