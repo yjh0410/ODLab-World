@@ -142,8 +142,6 @@ class YoloPConfig(YoloBaseConfig):
         ## Backbone
         self.bk_depthwise   = True
         self.use_pretrained = True
-        ## Neck
-        self.neck_depthwise = True
         ## FPN
         self.fpn_depthwise  = True
         ## Head
@@ -203,6 +201,16 @@ class YoloSConfig(YoloBaseConfig):
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.0
         self.copy_paste  = 0.5
+        self.affine_params = {
+            'degrees': 0.0,
+            'translate': 0.1,
+            'scale': [0.5, 1.5],
+            'shear': 0.0,
+            'perspective': 0.0,
+            'hsv_h': 0.015,
+            'hsv_s': 0.7,
+            'hsv_v': 0.4,
+        }
 
 # YOLO-M
 class YoloMConfig(YoloBaseConfig):
@@ -246,5 +254,5 @@ class YoloXConfig(YoloBaseConfig):
 
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
-        self.mixup_prob  = 0.2
+        self.mixup_prob  = 0.15
         self.copy_paste  = 0.5
