@@ -10,7 +10,7 @@ except:
 # IN1K pretrained weight
 pretrained_urls = {
     'p': None,
-    'n': None,
+    'n': "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/rtcnet_n_in1k.pth",
     's': None,
     'm': None,
     'l': None,

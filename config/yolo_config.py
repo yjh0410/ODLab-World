@@ -171,11 +171,12 @@ class YoloNConfig(YoloBaseConfig):
         self.depth = 0.34
         self.ratio = 2.0
         self.scale = "n"
+        self.use_pretrained = True
 
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.0
-        self.copy_paste  = 0.5
+        self.copy_paste  = 0.0
         self.affine_params = {
             'degrees': 0.0,
             'translate': 0.1,
