@@ -291,24 +291,22 @@ class YoloTrainer(object):
         # set second stage
         print('============== Second stage of Training ==============')
         self.second_stage = True
+        self.heavy_eval = True
 
         # close mosaic augmentation
         if self.train_loader.dataset.mosaic_prob > 0.:
             print(' - Close < Mosaic Augmentation > ...')
             self.train_loader.dataset.mosaic_prob = 0.
-            self.heavy_eval = True
 
         # close mixup augmentation
         if self.train_loader.dataset.mixup_prob > 0.:
             print(' - Close < Mixup Augmentation > ...')
             self.train_loader.dataset.mixup_prob = 0.
-            self.heavy_eval = True
 
         # close copy-paste augmentation
         if self.train_loader.dataset.copy_paste > 0.:
             print(' - Close < Copy-paste Augmentation > ...')
             self.train_loader.dataset.copy_paste = 0.
-            self.heavy_eval = True
 
 
 class RTDetrTrainer(object):
