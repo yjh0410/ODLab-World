@@ -106,7 +106,7 @@ class YoloBaseConfig(object):
         self.normalize_coords = False
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.15
-        self.copy_paste  = 0.5
+        self.copy_paste  = 1.0
         self.multi_scale = [0.5, 1.5]   # multi scale: [img_size * 0.5, img_size * 1.5]
         ## Pixel mean & std
         self.pixel_mean = [0., 0., 0.]
@@ -175,7 +175,7 @@ class YoloNConfig(YoloBaseConfig):
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.0
-        self.copy_paste  = 0.0
+        self.copy_paste  = 0.5
         self.affine_params = {
             'degrees': 0.0,
             'translate': 0.1,
@@ -200,7 +200,7 @@ class YoloSConfig(YoloBaseConfig):
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.0
-        self.copy_paste  = 0.5
+        self.copy_paste  = 1.0
 
 # YOLO-M
 class YoloMConfig(YoloBaseConfig):
@@ -215,7 +215,7 @@ class YoloMConfig(YoloBaseConfig):
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.1
-        self.copy_paste  = 0.5
+        self.copy_paste  = 1.0
 
 # YOLO-L
 class YoloLConfig(YoloBaseConfig):
@@ -230,7 +230,7 @@ class YoloLConfig(YoloBaseConfig):
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.15
-        self.copy_paste  = 0.5
+        self.copy_paste  = 1.0
 
 # YOLO-X
 class YoloXConfig(YoloBaseConfig):
@@ -245,4 +245,4 @@ class YoloXConfig(YoloBaseConfig):
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.15
-        self.copy_paste  = 0.5
+        self.copy_paste  = 1.0
