@@ -393,7 +393,8 @@ class RTDetrTrainer(object):
                 break
 
     def eval(self, model):
-        # chech model
+        # set eval mode
+        model.eval()
         model_eval = model if self.model_ema is None else self.model_ema.ema
 
         if distributed_utils.is_main_process():
@@ -412,9 +413,6 @@ class RTDetrTrainer(object):
                             checkpoint_path)               
             else:
                 print('eval ...')
-                # set eval mode
-                model_eval.eval()
-
                 # evaluate
                 with torch.no_grad():
                     self.evaluator.evaluate(model_eval)
@@ -436,12 +434,12 @@ class RTDetrTrainer(object):
                                 'args': self.args}, 
                                 checkpoint_path)                      
 
-                # set train mode.
-                model_eval.train()
-
         if self.args.distributed:
             # wait for all processes to synchronize
             dist.barrier()
+
+        # set train mode.
+        model.train()
 
     def train_one_epoch(self, model):
         metric_logger = MetricLogger(delimiter="  ")
