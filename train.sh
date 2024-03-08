@@ -28,8 +28,7 @@ elif [[ $WORLD_SIZE -gt 1 && $WORLD_SIZE -le 8 ]]; then
             --batch_size ${BATCH_SIZE} \
             --resume ${RESUME} \
             --fp16 \
-            --sybn \
-            --debug
+            --sybn
 else
     echo "The WORLD_SIZE is set to a value greater than 8, indicating the use of multi-machine \
           multi-card training mode, which is currently unsupported."
