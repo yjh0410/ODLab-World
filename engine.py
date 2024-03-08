@@ -69,7 +69,7 @@ class YoloTrainer(object):
         self.optimizer, self.start_epoch = build_yolo_optimizer(cfg, model, args.resume)
 
         # ---------------------------- Build LR Scheduler ----------------------------
-        self.lr_scheduler_warmup = LinearWarmUpLrScheduler(cfg.base_lr, wp_iter=args.wp_epoch * len(self.train_loader))
+        self.lr_scheduler_warmup = LinearWarmUpLrScheduler(cfg.base_lr, wp_iter=cfg.warmup_epoch * len(self.train_loader))
         self.lr_scheduler = build_lr_scheduler(cfg, self.optimizer, args.resume)
 
         # ---------------------------- Build Model-EMA ----------------------------
@@ -353,7 +353,7 @@ class RTDetrTrainer(object):
         self.optimizer, self.start_epoch = build_rtdetr_optimizer(cfg, model, args.resume)
 
         # ---------------------------- Build LR Scheduler ----------------------------
-        self.wp_lr_scheduler = LinearWarmUpLrScheduler(cfg.base_lr, wp_iter=cfg.wp_iter)
+        self.wp_lr_scheduler = LinearWarmUpLrScheduler(cfg.base_lr, wp_iter=cfg.warmup_iters)
         self.lr_scheduler    = build_lr_scheduler(cfg, self.optimizer, args.resume)
 
         # ---------------------------- Build Model-EMA ----------------------------
