@@ -87,7 +87,7 @@ def parse_args():
                         help='number of distributed processes')
     parser.add_argument('--sybn', action='store_true', default=False, 
                         help='use sybn.')
-    parser.add_argument('--find_unused_parameters', default=False, type=bool,
+    parser.add_argument('--find_unused_parameters', action='store_true', default=False,
                         help='set find_unused_parameters as True.')
     
     # Debug mode
