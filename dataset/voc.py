@@ -218,7 +218,6 @@ if __name__ == "__main__":
             ## Transforms
             self.train_img_size = 640
             self.test_img_size  = 640
-            self.random_crop_size = [320, 352, 384, 416, 448, 480, 512, 544, 576, 608, 640, 672, 704, 736, 768, 800]
             self.use_ablu = True
             self.aug_type = 'yolo'
             self.affine_params = {

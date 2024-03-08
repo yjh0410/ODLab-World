@@ -40,7 +40,7 @@ def build_yolo_optimizer(cfg, model, resume=None):
         # checkpoint state dict
         try:
             checkpoint_state_dict = checkpoint.pop("optimizer")
-            print('Load optimizer from the checkpoint: ', resume)
+            print('--Load optimizer from the checkpoint: ', resume)
             optimizer.load_state_dict(checkpoint_state_dict)
             start_epoch = checkpoint.pop("epoch") + 1
             del checkpoint, checkpoint_state_dict
@@ -92,7 +92,7 @@ def build_rtdetr_optimizer(cfg, model, resume=None):
 
     start_epoch = 0
     if resume and resume != 'None':
-        print('keep training: ', resume)
+        print('--Load optimizer from the checkpoint: ', resume)
         checkpoint = torch.load(resume)
         # checkpoint state dict
         checkpoint_state_dict = checkpoint.pop("optimizer")

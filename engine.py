@@ -13,8 +13,7 @@ from utils.vis_tools import vis_data
 
 # ----------------- Optimizer & LrScheduler Components -----------------
 from utils.solver.optimizer import build_yolo_optimizer, build_rtdetr_optimizer
-from utils.solver.lr_scheduler import build_lambda_lr_scheduler
-from utils.solver.lr_scheduler import build_wp_lr_scheduler, build_lr_scheduler
+from utils.solver.lr_scheduler import LinearWarmUpLrScheduler, build_lr_scheduler
 
 
 class YoloTrainer(object):
@@ -70,10 +69,8 @@ class YoloTrainer(object):
         self.optimizer, self.start_epoch = build_yolo_optimizer(cfg, model, args.resume)
 
         # ---------------------------- Build LR Scheduler ----------------------------
-        self.lr_scheduler, self.lf = build_lambda_lr_scheduler(cfg, self.optimizer)
-        self.lr_scheduler.last_epoch = self.start_epoch - 1  # do not move
-        if self.args.resume and self.args.resume != 'None':
-            self.lr_scheduler.step()
+        self.lr_scheduler_warmup = LinearWarmUpLrScheduler(args.base_lr, wp_iter=args.wp_epoch * len(self.train_loader))
+        self.lr_scheduler = build_lr_scheduler(cfg, self.optimizer, args.resume)
 
         # ---------------------------- Build Model-EMA ----------------------------
         if self.model_ema is not None:
@@ -103,6 +100,10 @@ class YoloTrainer(object):
             # train one epoch
             self.epoch = epoch
             self.train_one_epoch(model)
+
+            # LR Schedule
+            if (epoch + 1) > self.cfg.wp_epoch:
+                self.lr_scheduler.step()
 
             # eval one epoch
             if self.heavy_eval:
@@ -181,14 +182,11 @@ class YoloTrainer(object):
         for iter_i, (images, targets) in enumerate(metric_logger.log_every(self.train_loader, print_freq, header)):
             ni = iter_i + self.epoch * epoch_size
             # Warmup
-            if ni <= nw:
-                xi = [0, nw]  # x interp
-                for j, x in enumerate(self.optimizer.param_groups):
-                    # bias lr falls from 0.1 to lr0, all other lrs rise from 0.0 to lr0
-                    x['lr'] = np.interp(
-                        ni, xi, [self.cfg.warmup_bias_lr if j == 0 else 0.0, x['initial_lr'] * self.lf(self.epoch)])
-                    if 'momentum' in x:
-                        x['momentum'] = np.interp(ni, xi, [self.cfg.warmup_momentum, self.cfg.momentum])
+            if nw > 0 and ni < nw:
+                self.lr_scheduler_warmup(ni, self.optimizer)
+            elif ni == nw:
+                print("Warmup stage is over.")
+                self.lr_scheduler_warmup.set_lr(self.optimizer, self.cfg.base_lr)
                                 
             # To device
             images = images.to(self.device, non_blocking=True).float()
@@ -239,10 +237,6 @@ class YoloTrainer(object):
             if self.args.debug:
                 print("For debug mode, we only train 1 iteration")
                 break
-
-        # LR Schedule
-        if not self.second_stage:
-            self.lr_scheduler.step()
 
         # Gather the stats from all processes
         metric_logger.synchronize_between_processes()
@@ -359,7 +353,7 @@ class RTDetrTrainer(object):
         self.optimizer, self.start_epoch = build_rtdetr_optimizer(cfg, model, args.resume)
 
         # ---------------------------- Build LR Scheduler ----------------------------
-        self.wp_lr_scheduler = build_wp_lr_scheduler(cfg)
+        self.wp_lr_scheduler = LinearWarmUpLrScheduler(cfg.base_lr, wp_iter=cfg.wp_iter)
         self.lr_scheduler    = build_lr_scheduler(cfg, self.optimizer, args.resume)
 
         # ---------------------------- Build Model-EMA ----------------------------
@@ -376,6 +370,9 @@ class RTDetrTrainer(object):
             # train one epoch
             self.epoch = epoch
             self.train_one_epoch(model)
+
+            # LR Scheduler
+            self.lr_scheduler.step()
 
             # eval one epoch
             if self.heavy_eval:
@@ -518,9 +515,6 @@ class RTDetrTrainer(object):
             if self.args.debug:
                 print("For debug mode, we only train 1 iteration")
                 break
-
-        # LR Scheduler
-        self.lr_scheduler.step()
 
     def rescale_image_targets(self, images, targets, max_stride, multi_scale_range=[0.5, 1.5]):
         """

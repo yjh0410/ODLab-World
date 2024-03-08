@@ -4,6 +4,8 @@
 def build_gelan_config(args):
     if   args.model == 'gelan_c':
         return GElanCConfig()
+    elif args.model == 'gelan_m':
+        return GElanMConfig()
     else:
         raise NotImplementedError("No config for model: {}".format(args.model))
     
@@ -107,7 +109,7 @@ class GElanBaseConfig(object):
         self.normalize_coords = False
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.15
-        self.copy_paste  = 0.5
+        self.copy_paste  = 1.0
         self.multi_scale = [0.5, 1.5]   # multi scale: [img_size * 0.5, img_size * 1.5]
         ## Pixel mean & std
         self.pixel_mean = [0., 0., 0.]
@@ -132,6 +134,39 @@ class GElanBaseConfig(object):
         for k, v in config_dict.items():
             print("{} : {}".format(k, v))
 
+# GELAN-M (not complete yet)
+class GElanMConfig(GElanBaseConfig):
+    def __init__(self) -> None:
+        super().__init__()
+        ## Backbone
+        self.bk_down_pooling = True
+        self.backbone_feats = {
+            "c1": [48],
+            "c2": [48,  [96,  64],  96],
+            "c3": [96,  [192, 128], 192],
+            "c4": [192, [384, 256], 384],
+            "c5": [384, [576, 256], 576],
+        }
+        self.backbone_depth = 1
+        ## Neck
+        self.spp_inter_dim  = 256
+        self.spp_out_dim    = 576
+        ## FPN
+        self.fpn_down_pooling = True
+        self.fpn_depth    = 1
+        self.fpn_feats_td = {
+            "p4": [[384, 256], 384],
+            "p3": [[192, 128], 192],
+        }
+        self.fpn_feats_bu = {
+            "p4": [[384, 256], 384],
+            "p5": [[576, 256], 576],
+        }
+        # ---------------- Data process config ----------------
+        self.mosaic_prob = 1.0
+        self.mixup_prob  = 0.15
+        self.copy_paste  = 1.0
+
 # GELAN-C
 class GElanCConfig(GElanBaseConfig):
     def __init__(self) -> None:
@@ -139,5 +174,5 @@ class GElanCConfig(GElanBaseConfig):
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.15
-        self.copy_paste  = 0.5
+        self.copy_paste  = 1.0
 
