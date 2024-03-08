@@ -69,7 +69,7 @@ class YoloTrainer(object):
         self.optimizer, self.start_epoch = build_yolo_optimizer(cfg, model, args.resume)
 
         # ---------------------------- Build LR Scheduler ----------------------------
-        self.lr_scheduler_warmup = LinearWarmUpLrScheduler(args.base_lr, wp_iter=args.wp_epoch * len(self.train_loader))
+        self.lr_scheduler_warmup = LinearWarmUpLrScheduler(cfg.base_lr, wp_iter=args.wp_epoch * len(self.train_loader))
         self.lr_scheduler = build_lr_scheduler(cfg, self.optimizer, args.resume)
 
         # ---------------------------- Build Model-EMA ----------------------------
