@@ -102,7 +102,7 @@ class YoloTrainer(object):
             self.train_one_epoch(model)
 
             # LR Schedule
-            if (epoch + 1) > self.cfg.wp_epoch:
+            if (epoch + 1) > self.cfg.warmup_epoch:
                 self.lr_scheduler.step()
 
             # eval one epoch
