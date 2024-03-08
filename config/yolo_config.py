@@ -94,7 +94,7 @@ class YoloBaseConfig(object):
         self.warmup_momentum = 0.8
 
         # ---------------- Lr Scheduler config ----------------
-        self.warmup_epoch = 3
+        self.warmup_epoch = 1
         self.lr_scheduler = "cosine"
         self.max_epoch    = 500
         self.eval_epoch   = 10
