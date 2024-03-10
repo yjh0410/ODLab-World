@@ -109,7 +109,7 @@ class GElanBaseConfig(object):
         self.normalize_coords = False
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.15
-        self.copy_paste  = 1.0
+        self.copy_paste  = 1.0          # approximate by the YOLOX's mixup
         self.multi_scale = [0.5, 1.5]   # multi scale: [img_size * 0.5, img_size * 1.5]
         ## Pixel mean & std
         self.pixel_mean = [0., 0., 0.]

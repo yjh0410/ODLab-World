@@ -2,9 +2,7 @@
 
 
 def build_yolo_config(args):
-    if   args.model == 'yolo_p':
-        return YoloPConfig()
-    elif args.model == 'yolo_n':
+    if   args.model == 'yolo_n':
         return YoloNConfig()
     elif args.model == 'yolo_s':
         return YoloSConfig()
@@ -106,7 +104,7 @@ class YoloBaseConfig(object):
         self.normalize_coords = False
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.15
-        self.copy_paste  = 1.0
+        self.copy_paste  = 1.0          # approximated by the YOLOX's mixup
         self.multi_scale = [0.5, 1.5]   # multi scale: [img_size * 0.5, img_size * 1.5]
         ## Pixel mean & std
         self.pixel_mean = [0., 0., 0.]
@@ -130,37 +128,6 @@ class YoloBaseConfig(object):
         config_dict = {key: value for key, value in self.__dict__.items() if not key.startswith('__')}
         for k, v in config_dict.items():
             print("{} : {}".format(k, v))
-
-# YOLO-P config
-class YoloPConfig(YoloBaseConfig):
-    def __init__(self) -> None:
-        # ---------------- Model config ----------------
-        self.width = 0.25
-        self.depth = 0.34
-        self.ratio = 2.0
-        self.scale = "p"
-        ## Backbone
-        self.bk_depthwise   = True
-        self.use_pretrained = True
-        ## FPN
-        self.fpn_depthwise  = True
-        ## Head
-        self.head_depthwise = True
-
-        # ---------------- Data process config ----------------
-        self.mosaic_prob = 0.5
-        self.mixup_prob  = 0.0
-        self.copy_paste  = 0.0
-        self.affine_params = {
-            'degrees': 0.0,
-            'translate': 0.1,
-            'scale': [0.5, 1.5],
-            'shear': 0.0,
-            'perspective': 0.0,
-            'hsv_h': 0.015,
-            'hsv_s': 0.7,
-            'hsv_v': 0.4,
-        }
 
 # YOLO-N
 class YoloNConfig(YoloBaseConfig):
