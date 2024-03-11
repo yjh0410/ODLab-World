@@ -14,6 +14,13 @@ except:
 
 coco_class_indexs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 27, 28, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 67, 70, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 84, 85, 86, 87, 88, 89, 90]
 coco_class_labels = ('person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat',  'traffic light',  'fire hydrant',  'stop sign',  'parking meter',  'bench',  'bird',  'cat',  'dog',  'horse',  'sheep',  'cow',  'elephant',  'bear',  'zebra',  'giraffe',  'backpack',  'umbrella',  'handbag',  'tie',  'suitcase',  'frisbee',  'skis',  'snowboard',  'sports ball',  'kite',  'baseball bat',  'baseball glove',  'skateboard',  'surfboard',  'tennis racket',  'bottle',  'wine glass',  'cup',  'fork',  'knife',  'spoon',  'bowl',  'banana',  'apple',  'sandwich',  'orange',  'broccoli',  'carrot',  'hot dog',  'pizza',  'donut',  'cake',  'chair',  'couch',  'potted plant',  'bed',  'dining table',  'toilet',  'tv',  'laptop',  'mouse',  'remote',  'keyboard',  'cell phone',  'microwave',  'oven',  'toaster',  'sink',  'refrigerator',  'book',  'clock',  'vase',  'scissors',  'teddy bear',  'hair drier',  'toothbrush')
+coco_json_files = {
+    'train2017_clean': 'instances_train2017_clean.json',
+    'val2017_clean'  : 'instances_val2017_clean.json',
+    'train2017'      : 'instances_train2017.json',
+    'val2017'        : 'instances_val2017.json',
+    'test2017'       : 'image_info_test.json',
+}
 
 
 class COCODataset(Dataset):
@@ -26,22 +33,18 @@ class COCODataset(Dataset):
                  use_mask  :bool = False,
                  ):
         # ----------- Basic parameters -----------
+        self.data_dir  = data_dir
         self.image_set = image_set
         self.is_train  = is_train
         self.use_mask  = use_mask
         self.num_classes = 80
-        # ----------- Path parameters -----------
-        self.data_dir = data_dir
-        if image_set == 'train2017':
-            self.json_file='instances_train2017_clean.json'
-        elif image_set == 'val2017':
-            self.json_file='instances_val2017_clean.json'
-        elif image_set == 'test2017':
-            self.json_file='image_info_test-dev2017.json'
-        else:
-            raise NotImplementedError("Unknown json image set {}.".format(image_set))
         # ----------- Data parameters -----------
-        self.coco = COCO(os.path.join(self.data_dir, 'annotations', self.json_file))
+        try:
+            self.json_file = coco_json_files['{}_clean'.format(image_set)]
+            self.coco = COCO(os.path.join(self.data_dir, 'annotations', self.json_file))
+        except:
+            self.json_file = coco_json_files['{}'.format(image_set)]
+            self.coco = COCO(os.path.join(self.data_dir, 'annotations', self.json_file))
         self.ids = self.coco.getImgIds()
         self.class_ids = sorted(self.coco.getCatIds())
         self.dataset_size = len(self.ids)
