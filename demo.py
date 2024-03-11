@@ -25,10 +25,6 @@ def parse_args():
     # Basic setting
     parser.add_argument('-size', '--img_size', default=640, type=int,
                         help='the max size of input image')
-    parser.add_argument('--mosaic', default=None, type=float,
-                        help='mosaic augmentation.')
-    parser.add_argument('--mixup', default=None, type=float,
-                        help='mixup augmentation.')
     parser.add_argument('--mode', default='image',
                         type=str, help='Use the data from image, video or camera')
     parser.add_argument('--cuda', action='store_true', default=False,
