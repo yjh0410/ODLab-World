@@ -462,7 +462,7 @@ class RTDetrTrainer(object):
             elif ni == nw and lr_warmup_stage:
                 print('Warmup stage is over.')
                 lr_warmup_stage = False
-                self.wp_lr_scheduler.set_lr(self.optimizer, self.cfg.base_lr, self.cfg.base_lr)
+                self.wp_lr_scheduler.set_lr(self.optimizer, self.cfg.base_lr)
                                 
             # To device
             images = images.to(self.device, non_blocking=True).float()

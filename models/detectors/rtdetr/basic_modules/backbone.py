@@ -19,9 +19,8 @@ pretrained_urls = {
     'resnet50':  ResNet50_Weights,
     'resnet101': ResNet101_Weights,
     # RTCNet series
-    'rtcnet_p': None,
-    'rtcnet_n': "https://github.com/yjh0410/image_classification_pytorch/releases/download/weight/rtcnet_n_in1k.pth",
-    'rtcnet_s': None,
+    'rtcnet_n': "https://github.com/yjh0410/ICLab/releases/download/in1k_pretrained/rtcnet_n_in1k_62.1.pth",
+    'rtcnet_s': "https://github.com/yjh0410/ICLab/releases/download/in1k_pretrained/rtcnet_s_in1k_71.3.pth",
     'rtcnet_m': None,
     'rtcnet_l': None,
     'rtcnet_x': None,
