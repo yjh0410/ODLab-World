@@ -244,8 +244,8 @@ class RTDetrSConfig(RTDetrBaseConfig):
         self.use_pretrained = True
         ## Image Encoder - FPN
         self.fpn_num_blocks = 1
-        self.fpn_expand_ratio = 1.0
-        self.hidden_dim = 128
+        self.fpn_expand_ratio = 0.5
+        self.hidden_dim = 256
         self.en_num_heads = 8
         self.en_num_layers = 1
         self.en_ffn_dim = 1024

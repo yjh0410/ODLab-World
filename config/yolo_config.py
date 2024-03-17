@@ -28,25 +28,21 @@ class YoloBaseConfig(object):
         self.num_levels = 3
         self.scale      = "b"
         ## Backbone
-        self.backbone = 'yolo_backbone'
         self.bk_act   = 'silu'
         self.bk_norm  = 'BN'
         self.bk_depthwise = False
         self.use_pretrained = False
         ## Neck
-        self.neck           = 'sppf'
         self.neck_act       = 'silu'
         self.neck_norm      = 'BN'
         self.neck_depthwise = False
         self.neck_expand_ratio = 0.5
         self.spp_pooling_size  = 5
         ## FPN
-        self.fpn      = 'yolo_pafpn'
         self.fpn_act  = 'silu'
         self.fpn_norm = 'BN'
         self.fpn_depthwise = False
         ## Head
-        self.head      = 'yolo_head'
         self.head_act  = 'silu'
         self.head_norm = 'BN'
         self.head_depthwise = False
@@ -55,14 +51,12 @@ class YoloBaseConfig(object):
 
         # ---------------- Post-process config ----------------
         ## Post process
-        self.postprocess_type = "level_wise"  # optional: [level_wise, gather] 
         self.val_topk = 1000                  # 1000 for 'level_wise'; 30000 for 'gather'
         self.val_conf_thresh = 0.001
         self.val_nms_thresh  = 0.7
         self.test_topk = 100
         self.test_conf_thresh = 0.2
         self.test_nms_thresh  = 0.5
-        self.max_det = 300                    # only work for 'gather'
 
         # ---------------- Assignment config ----------------
         ## Matcher
@@ -105,7 +99,7 @@ class YoloBaseConfig(object):
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.15
         self.copy_paste  = 1.0          # approximated by the YOLOX's mixup
-        self.multi_scale = [0.5, 1.5]   # multi scale: [img_size * 0.5, img_size * 1.5]
+        self.multi_scale = [0.5, 1.25]   # multi scale: [img_size * 0.5, img_size * 1.25]
         ## Pixel mean & std
         self.pixel_mean = [0., 0., 0.]
         self.pixel_std  = [255., 255., 255.]

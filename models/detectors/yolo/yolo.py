@@ -26,12 +26,10 @@ class Yolo(nn.Module):
         self.deploy = deploy
         self.num_classes = cfg.num_classes
         ## Post-process parameters
-        self.postprocess_type = cfg.postprocess_type
         self.topk_candidates  = cfg.val_topk        if is_val else cfg.test_topk
         self.conf_thresh      = cfg.val_conf_thresh if is_val else cfg.test_conf_thresh
         self.nms_thresh       = cfg.val_nms_thresh  if is_val else cfg.test_nms_thresh
         self.no_multi_labels  = False if is_val else True
-        self.max_det          = cfg.max_det
         
         # ---------------------- Network Parameters ----------------------
         self.backbone = YoloBackbone(cfg)
@@ -40,7 +38,7 @@ class Yolo(nn.Module):
         self.head     = YoloDetHead(cfg, self.fpn.out_dims)
         self.pred     = YoloDetPredLayer(cfg, self.head.cls_head_dim, self.head.reg_head_dim)
 
-    def post_process_by_feat(self, cls_preds, box_preds):
+    def post_process(self, cls_preds, box_preds):
         """
         We process predictions at each scale hierarchically
         Input:
@@ -118,78 +116,6 @@ class Yolo(nn.Module):
         
         return bboxes, scores, labels
     
-    def post_process_gahter(self, cls_preds, box_preds):
-        """
-        We aggregate the predictions at all scales and process them uniformly.
-        Input:
-            cls_preds: List[torch.Tensor] -> [[B, M, C], ...], B=1
-            box_preds: List[torch.Tensor] -> [[B, M, 4], ...], B=1
-        Output:
-            bboxes: np.array -> [N, 4]
-            scores: np.array -> [N,]
-            labels: np.array -> [N,]
-        """
-        # List[B, M, C] -> [B, M, C] -> [M, C]
-        cls_preds = torch.cat(cls_preds, dim=1)[0]
-        box_preds = torch.cat(box_preds, dim=1)[0]
-        
-        if self.no_multi_labels:
-            # [M,]
-            scores, labels = torch.max(cls_preds.sigmoid(), dim=1)
-
-            # Keep top k top scoring indices only.
-            num_topk = min(self.topk_candidates, box_preds.size(0))
-
-            # topk candidates
-            predicted_prob, topk_idxs = scores.sort(descending=True)
-            topk_scores = predicted_prob[:num_topk]
-            topk_idxs = topk_idxs[:num_topk]
-
-            # filter out the proposals with low confidence score
-            keep_idxs = topk_scores > self.conf_thresh
-            scores = topk_scores[keep_idxs]
-            topk_idxs = topk_idxs[keep_idxs]
-
-            labels = labels[topk_idxs]
-            bboxes = box_preds[topk_idxs]
-        else:
-            # [M, C] -> [MC,]
-            scores_i = cls_preds.sigmoid().flatten()
-
-            # Keep top k top scoring indices only.
-            num_topk = min(self.topk_candidates, box_preds.size(0))
-
-            # torch.sort is actually faster than .topk (at least on GPUs)
-            predicted_prob, topk_idxs = scores_i.sort(descending=True)
-            topk_scores = predicted_prob[:num_topk]
-            topk_idxs = topk_idxs[:num_topk]
-
-            # filter out the proposals with low confidence score
-            keep_idxs = topk_scores > self.conf_thresh
-            scores = topk_scores[keep_idxs]
-            topk_idxs = topk_idxs[keep_idxs]
-
-            anchor_idxs = torch.div(topk_idxs, self.num_classes, rounding_mode='floor')
-            labels = topk_idxs % self.num_classes
-
-            bboxes = box_preds[anchor_idxs]
-
-        # to cpu & numpy
-        scores = scores.cpu().numpy()
-        labels = labels.cpu().numpy()
-        bboxes = bboxes.cpu().numpy()
-
-        # nms
-        scores, labels, bboxes = multiclass_nms(
-            scores, labels, bboxes, self.nms_thresh, self.num_classes)
-        
-        if self.max_det > 0:
-            scores = scores[:self.max_det]
-            labels = labels[:self.max_det]
-            bboxes = bboxes[:self.max_det]
-
-        return bboxes, scores, labels
-    
     def forward(self, x):
         # ---------------- Backbone ----------------
         pyramid_feats = self.backbone(x)
@@ -220,12 +146,7 @@ class Yolo(nn.Module):
 
             else:
                 # post process
-                if self.postprocess_type == "level_wise":
-                    bboxes, scores, labels = self.post_process_by_feat(all_cls_preds, all_box_preds)
-                elif self.postprocess_type == "gather":
-                    bboxes, scores, labels = self.post_process_gahter(all_cls_preds, all_box_preds)
-                else:
-                    raise NotImplementedError("Unknown type of post-process: {}".format(self.postprocess_type))
+                bboxes, scores, labels = self.post_process(all_cls_preds, all_box_preds)
                 outputs = {
                     "scores": scores,
                     "labels": labels,
