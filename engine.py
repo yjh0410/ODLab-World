@@ -64,7 +64,8 @@ class YoloTrainer(object):
         self.scaler = torch.cuda.amp.GradScaler(enabled=args.fp16)
 
         # ---------------------------- Build Optimizer ----------------------------
-        cfg.base_lr = cfg.per_image_lr * args.batch_size
+        cfg.grad_accumulate = max(64 // args.batch_size, 1)
+        cfg.base_lr = cfg.per_image_lr * args.batch_size * cfg.grad_accumulate
         cfg.min_lr  = cfg.base_lr * cfg.min_lr_ratio
         self.optimizer, self.start_epoch = build_yolo_optimizer(cfg, model, args.resume)
 
@@ -219,17 +220,20 @@ class YoloTrainer(object):
             # Backward
             self.scaler.scale(losses).backward()
 
-            # Optimize
+            # Gradient clip
             if self.cfg.clip_max_norm > 0:
                 self.scaler.unscale_(self.optimizer)
                 torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=self.cfg.clip_max_norm)
-            self.scaler.step(self.optimizer)
-            self.scaler.update()
-            self.optimizer.zero_grad()
 
-            # ModelEMA
-            if self.model_ema is not None:
-                self.model_ema.update(model)
+            # Optimize
+            if (iter_i + 1) % self.cfg.grad_accumulate == 0:
+                self.scaler.step(self.optimizer)
+                self.scaler.update()
+                self.optimizer.zero_grad()
+
+                # ModelEMA
+                if self.model_ema is not None:
+                    self.model_ema.update(model)
 
             # Update log
             metric_logger.update(**loss_dict_reduced)
@@ -350,7 +354,8 @@ class RTDetrTrainer(object):
         self.scaler = torch.cuda.amp.GradScaler(enabled=args.fp16)
 
         # ---------------------------- Build Optimizer ----------------------------
-        cfg.base_lr = cfg.per_image_lr * args.batch_size
+        cfg.grad_accumulate = max(64 // args.batch_size, 1)
+        cfg.base_lr = cfg.per_image_lr * args.batch_size * cfg.grad_accumulate
         cfg.min_lr  = cfg.base_lr * cfg.min_lr_ratio
         self.optimizer, self.start_epoch = build_rtdetr_optimizer(cfg, model, args.resume)
 
@@ -495,18 +500,21 @@ class RTDetrTrainer(object):
             # Backward
             self.scaler.scale(losses).backward()
 
-            # Optimize
+            # Gradient clip
             grad_norm = None
             if self.cfg.clip_max_norm > 0:
                 self.scaler.unscale_(self.optimizer)
                 grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=self.cfg.clip_max_norm)
-            self.scaler.step(self.optimizer)
-            self.scaler.update()
-            self.optimizer.zero_grad()
 
-            # ModelEMA
-            if self.model_ema is not None:
-                self.model_ema.update(model)
+            # Optimize
+            if (iter_i + 1) % self.cfg.grad_accumulate == 0:
+                self.scaler.step(self.optimizer)
+                self.scaler.update()
+                self.optimizer.zero_grad()
+
+                # ModelEMA
+                if self.model_ema is not None:
+                    self.model_ema.update(model)
 
             # Update log
             metric_logger.update(loss=losses.item(), **loss_dict_reduced)
