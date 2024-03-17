@@ -12,8 +12,6 @@ def build_rtdetr_config(args):
         return RTDetrR50XConfig()
     elif args.model == "rtdetr_r101":
         return RTDetrR101Config()
-    elif args.model == "rtdetr_n":
-        return RTDetrNConfig()
     elif args.model == "rtdetr_s":
         return RTDetrSConfig()
     elif args.model == "rtdetr_m":
@@ -196,34 +194,6 @@ class RTDetrR101Config(RTDetrBaseConfig):
         self.fpn_expand_ratio = 1.0
         ## Transformer Decoder
         self.de_num_layers = 6
-
-# RT-DETR-N (not complete yet)
-class RTDetrNConfig(RTDetrBaseConfig):
-    def __init__(self) -> None:
-        super().__init__()
-        # ---------------- Model config ----------------
-        self.width    = 0.25
-        self.depth    = 0.34
-        self.ratio    = 2.0
-        self.out_stride = [8, 16, 32]
-        self.max_stride = 32
-        self.scale      = "n"
-        ## Backbone
-        self.backbone = 'rtcnet'
-        self.bk_act   = 'silu'
-        self.bk_norm  = 'BN'
-        self.bk_depthwise = False
-        self.use_pretrained = True
-        ## Image Encoder - FPN
-        self.fpn_num_blocks = 1
-        self.fpn_expand_ratio = 1.0
-        self.hidden_dim = 64
-        self.en_num_heads = 8
-        self.en_num_layers = 1
-        self.en_ffn_dim = 512
-        ## Transformer Decoder
-        self.de_num_layers = 3
-        self.de_ffn_dim    = 512
 
 # RT-DETR-S (not complete yet)
 class RTDetrSConfig(RTDetrBaseConfig):
