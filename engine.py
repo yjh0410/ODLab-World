@@ -75,7 +75,7 @@ class YoloTrainer(object):
 
         # ---------------------------- Build Model-EMA ----------------------------
         if self.model_ema is not None:
-            update_init = self.start_epoch * len(self.train_loader)
+            update_init = self.start_epoch * len(self.train_loader) // cfg.grad_accumulate
             print("Initialize ModelEMA's updates: {}".format(update_init))
             self.model_ema.updates = update_init
 
@@ -366,7 +366,7 @@ class RTDetrTrainer(object):
 
         # ---------------------------- Build Model-EMA ----------------------------
         if self.model_ema is not None:
-            update_init = self.start_epoch * len(self.train_loader)
+            update_init = self.start_epoch * len(self.train_loader) // cfg.grad_accumulate
             print("Initialize ModelEMA's updates: {}".format(update_init))
             self.model_ema.updates = update_init            
 
