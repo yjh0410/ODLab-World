@@ -4,7 +4,6 @@
 import torch
 from .yolo.build   import build_yolo
 from .rtdetr.build import build_rtdetr
-from .gelan.build  import build_gelan
 
 # build object detector
 def build_model(args, cfg, is_val=False):
@@ -15,9 +14,6 @@ def build_model(args, cfg, is_val=False):
     ## RT-DETR
     elif 'rtdetr' in args.model:
         model, criterion = build_rtdetr(cfg, is_val)
-    ## G-ELAN
-    elif 'gelan' in args.model:
-        model, criterion = build_gelan(cfg, is_val)
 
     if is_val:
         # ------------ Load pretrained weight ------------

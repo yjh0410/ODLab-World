@@ -46,12 +46,13 @@ class YoloBaseConfig(object):
         self.head_act  = 'silu'
         self.head_norm = 'BN'
         self.head_depthwise = False
+        self.head_dim       = 256
         self.num_cls_head   = 2
         self.num_reg_head   = 2
 
         # ---------------- Post-process config ----------------
         ## Post process
-        self.val_topk = 1000                  # 1000 for 'level_wise'; 30000 for 'gather'
+        self.val_topk = 1000
         self.val_conf_thresh = 0.001
         self.val_nms_thresh  = 0.7
         self.test_topk = 100
@@ -60,13 +61,13 @@ class YoloBaseConfig(object):
 
         # ---------------- Assignment config ----------------
         ## Matcher
-        self.tal_topk_candidates = 10
-        self.tal_alpha = 0.5
+        self.tal_topk_candidates = 13
+        self.tal_alpha = 1.0
         self.tal_beta  = 6.0
         ## Loss weight
-        self.loss_cls = 0.5
-        self.loss_box = 7.5
-        self.loss_dfl = 1.5
+        self.loss_cls = 1.0
+        self.loss_box = 2.5
+        self.loss_dfl = 0.5
 
         # ---------------- ModelEMA config ----------------
         self.use_ema = True
@@ -88,7 +89,7 @@ class YoloBaseConfig(object):
         # ---------------- Lr Scheduler config ----------------
         self.warmup_epoch = 3
         self.lr_scheduler = "cosine"
-        self.max_epoch    = 500
+        self.max_epoch    = 300
         self.eval_epoch   = 10
         self.no_aug_epoch = 20
 
@@ -98,7 +99,7 @@ class YoloBaseConfig(object):
         self.normalize_coords = False
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.15
-        self.copy_paste  = 1.0          # approximated by the YOLOX's mixup
+        self.copy_paste  = 0.0           # approximated by the YOLOX's mixup
         self.multi_scale = [0.5, 1.25]   # multi scale: [img_size * 0.5, img_size * 1.25]
         ## Pixel mean & std
         self.pixel_mean = [0., 0., 0.]
@@ -158,6 +159,7 @@ class YoloSConfig(YoloBaseConfig):
         self.depth = 0.34
         self.ratio = 2.0
         self.scale = "s"
+        self.use_pretrained = True
 
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
@@ -173,6 +175,7 @@ class YoloMConfig(YoloBaseConfig):
         self.depth = 0.67
         self.ratio = 1.5
         self.scale = "m"
+        self.use_pretrained = True
 
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
@@ -188,6 +191,7 @@ class YoloLConfig(YoloBaseConfig):
         self.depth = 1.0
         self.ratio = 1.0
         self.scale = "l"
+        self.use_pretrained = True
 
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
@@ -200,9 +204,10 @@ class YoloXConfig(YoloBaseConfig):
         super().__init__()
         # ---------------- Model config ----------------
         self.width = 1.25
-        self.depth = 1.0
+        self.depth = 1.34
         self.ratio = 1.0
         self.scale = "x"
+        self.use_pretrained = True
 
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0

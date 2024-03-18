@@ -1,8 +1,7 @@
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 
-from utils.box_ops import bbox2dist, bbox_iou
+from utils.box_ops import bbox2dist, bbox_iou, get_ious
 from utils.distributed_utils import get_world_size, is_dist_avail_and_initialized
 
 from .matcher import TaskAlignedAssigner
@@ -25,20 +24,24 @@ class SetCriterion(object):
                                            beta            = cfg.tal_beta
                                            )
 
-    def loss_classes(self, pred_cls, gt_score):
-        # compute bce loss
-        loss_cls = F.binary_cross_entropy_with_logits(pred_cls, gt_score, reduction='none')
+    def loss_classes(self, pred_cls, gt_score, gt_label):
+        # Compute VFL
+        pred_score = F.sigmoid(pred_cls).detach()
+        target = F.one_hot(gt_label, num_classes=self.num_classes + 1)[..., :-1]
+        weight = 0.75 * pred_score.pow(2.0) * (1 - target) + gt_score
+
+        loss_cls = F.binary_cross_entropy_with_logits(pred_cls, gt_score, weight=weight, reduction='none')
 
         return loss_cls
     
-    def loss_bboxes(self, pred_box, gt_box, bbox_weight):
+    def loss_bboxes(self, pred_box, gt_box):
         # regression loss
-        ious = bbox_iou(pred_box, gt_box, xywh=False, CIoU=True)
-        loss_box = (1.0 - ious.squeeze(-1)) * bbox_weight
+        ious = get_ious(pred_box, gt_box, "xyxy", 'giou')
+        loss_box = 1.0 - ious
 
         return loss_box
     
-    def loss_dfl(self, pred_reg, gt_box, anchor, stride, bbox_weight=None):
+    def loss_dfl(self, pred_reg, gt_box, anchor, stride):
         # rescale coords by stride
         gt_box_s = gt_box / stride
         anchor_s = anchor / stride
@@ -65,9 +68,6 @@ class SetCriterion(object):
 
         loss_dfl = (loss_left + loss_right).mean(-1)
         
-        if bbox_weight is not None:
-            loss_dfl *= bbox_weight
-
         return loss_dfl
 
     def __call__(self, outputs, targets):        
@@ -91,6 +91,7 @@ class SetCriterion(object):
         anchors = torch.cat(outputs['anchors'], dim=0)
         
         # --------------- label assignment ---------------
+        gt_label_targets = []
         gt_score_targets = []
         gt_bbox_targets = []
         fg_masks = []
@@ -111,14 +112,15 @@ class SetCriterion(object):
             # check target
             if len(tgt_labels) == 0 or tgt_boxs.max().item() == 0.:
                 # There is no valid gt
-                fg_mask  = cls_preds.new_zeros(1, num_anchors).bool()               #[1, M,]
-                gt_score = cls_preds.new_zeros((1, num_anchors, self.num_classes)) #[1, M, C]
-                gt_box   = cls_preds.new_zeros((1, num_anchors, 4))                  #[1, M, 4]
+                fg_mask  = cls_preds.new_zeros(1, num_anchors).bool()                       # [1, M,]
+                gt_label = cls_preds.new_zeros((1, num_anchors)).long()                     # [1, M,]
+                gt_score = cls_preds.new_zeros((1, num_anchors, self.num_classes)).float()  # [1, M, C]
+                gt_box   = cls_preds.new_zeros((1, num_anchors, 4)).float()                 # [1, M, 4]
             else:
                 tgt_labels = tgt_labels[None, :, None]      # [1, Mp, 1]
                 tgt_boxs = tgt_boxs[None]                   # [1, Mp, 4]
                 (
-                    _,
+                    gt_label,   # [1, M]
                     gt_box,     # [1, M, 4]
                     gt_score,   # [1, M, C]
                     fg_mask,    # [1, M,]
@@ -130,12 +132,14 @@ class SetCriterion(object):
                     gt_labels = tgt_labels,
                     gt_bboxes = tgt_boxs
                     )
+            gt_label_targets.append(gt_label)
             gt_score_targets.append(gt_score)
             gt_bbox_targets.append(gt_box)
             fg_masks.append(fg_mask)
 
         # List[B, 1, M, C] -> Tensor[B, M, C] -> Tensor[BM, C]
         fg_masks = torch.cat(fg_masks, 0).view(-1)                                    # [BM,]
+        gt_label_targets = torch.cat(gt_label_targets, 0).view(-1)                    # [BM,]
         gt_score_targets = torch.cat(gt_score_targets, 0).view(-1, self.num_classes)  # [BM, C]
         gt_bbox_targets = torch.cat(gt_bbox_targets, 0).view(-1, 4)                   # [BM, 4]
         num_fgs = gt_score_targets.sum()
@@ -143,18 +147,17 @@ class SetCriterion(object):
         # Average loss normalizer across all the GPUs
         if is_dist_avail_and_initialized():
             torch.distributed.all_reduce(num_fgs)
-        num_fgs = (num_fgs / get_world_size()).clamp(1.0)
+        num_fgs = (num_fgs / get_world_size()).clamp(1.0).item()
 
         # ------------------ Classification loss ------------------
         cls_preds = cls_preds.view(-1, self.num_classes)
-        loss_cls = self.loss_classes(cls_preds, gt_score_targets)
+        loss_cls = self.loss_classes(cls_preds, gt_score_targets, gt_label_targets)
         loss_cls = loss_cls.sum() / num_fgs
 
         # ------------------ Regression loss ------------------
         box_preds_pos = box_preds.view(-1, 4)[fg_masks]
         box_targets_pos = gt_bbox_targets.view(-1, 4)[fg_masks]
-        bbox_weight = gt_score_targets[fg_masks].sum(-1)
-        loss_box = self.loss_bboxes(box_preds_pos, box_targets_pos, bbox_weight)
+        loss_box = self.loss_bboxes(box_preds_pos, box_targets_pos)
         loss_box = loss_box.sum() / num_fgs
 
         # ------------------ Distribution focal loss  ------------------
@@ -168,7 +171,7 @@ class SetCriterion(object):
         anchors_pos = anchors[fg_masks]
         strides_pos = strides[fg_masks]
         ## compute dfl
-        loss_dfl = self.loss_dfl(reg_preds_pos, box_targets_pos, anchors_pos, strides_pos, bbox_weight)
+        loss_dfl = self.loss_dfl(reg_preds_pos, box_targets_pos, anchors_pos, strides_pos)
         loss_dfl = loss_dfl.sum() / num_fgs
 
         # total loss
