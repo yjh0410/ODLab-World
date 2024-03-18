@@ -215,6 +215,7 @@ class YoloTrainer(object):
                 # Compute loss
                 loss_dict = self.criterion(outputs=outputs, targets=targets)
                 losses = loss_dict['losses']
+                losses /= self.cfg.grad_accumulate
                 loss_dict_reduced = distributed_utils.reduce_dict(loss_dict)
 
             # Backward
@@ -495,6 +496,7 @@ class RTDetrTrainer(object):
                 outputs = model(images, targets)    
                 loss_dict = self.criterion(outputs, targets)
                 losses = sum(loss_dict.values())
+                losses /= self.cfg.grad_accumulate
                 loss_dict_reduced = distributed_utils.reduce_dict(loss_dict)
 
             # Backward
