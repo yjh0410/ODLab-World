@@ -132,7 +132,6 @@ class YoloNConfig(YoloBaseConfig):
         self.depth = 0.34
         self.ratio = 2.0
         self.scale = "n"
-        self.use_pretrained = True
 
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
@@ -158,7 +157,6 @@ class YoloSConfig(YoloBaseConfig):
         self.depth = 0.34
         self.ratio = 2.0
         self.scale = "s"
-        self.use_pretrained = True
 
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
@@ -174,7 +172,6 @@ class YoloMConfig(YoloBaseConfig):
         self.depth = 0.67
         self.ratio = 1.5
         self.scale = "m"
-        self.use_pretrained = True
 
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
@@ -190,7 +187,6 @@ class YoloLConfig(YoloBaseConfig):
         self.depth = 1.0
         self.ratio = 1.0
         self.scale = "l"
-        self.use_pretrained = True
 
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
@@ -206,7 +202,6 @@ class YoloXConfig(YoloBaseConfig):
         self.depth = 1.34
         self.ratio = 1.0
         self.scale = "x"
-        self.use_pretrained = True
 
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
