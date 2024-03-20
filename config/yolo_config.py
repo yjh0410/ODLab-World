@@ -136,7 +136,7 @@ class YoloNConfig(YoloBaseConfig):
         # ---------------- Data process config ----------------
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.0
-        self.copy_paste  = 0.0
+        self.copy_paste  = 0.5
         self.affine_params = {
             'degrees': 0.0,
             'translate': 0.1,

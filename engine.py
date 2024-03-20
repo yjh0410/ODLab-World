@@ -64,8 +64,8 @@ class YoloTrainer(object):
         self.scaler = torch.cuda.amp.GradScaler(enabled=args.fp16)
 
         # ---------------------------- Build Optimizer ----------------------------
-        cfg.grad_accumulate = max(64 // args.batch_size, 1)
-        cfg.base_lr = cfg.per_image_lr * args.batch_size * cfg.grad_accumulate
+        self.grad_accumulate = max(256 // args.batch_size, 1)
+        cfg.base_lr = cfg.per_image_lr * args.batch_size * self.grad_accumulate
         cfg.min_lr  = cfg.base_lr * cfg.min_lr_ratio
         self.optimizer, self.start_epoch = build_yolo_optimizer(cfg, model, args.resume)
 
@@ -75,7 +75,7 @@ class YoloTrainer(object):
 
         # ---------------------------- Build Model-EMA ----------------------------
         if self.model_ema is not None:
-            update_init = self.start_epoch * len(self.train_loader) // cfg.grad_accumulate
+            update_init = self.start_epoch * len(self.train_loader) // self.grad_accumulate
             print("Initialize ModelEMA's updates: {}".format(update_init))
             self.model_ema.updates = update_init
 
@@ -215,7 +215,7 @@ class YoloTrainer(object):
                 # Compute loss
                 loss_dict = self.criterion(outputs=outputs, targets=targets)
                 losses = loss_dict['losses']
-                losses /= self.cfg.grad_accumulate
+                losses /= self.grad_accumulate
                 loss_dict_reduced = distributed_utils.reduce_dict(loss_dict)
 
             # Backward
@@ -227,7 +227,7 @@ class YoloTrainer(object):
                 torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=self.cfg.clip_max_norm)
 
             # Optimize
-            if (iter_i + 1) % self.cfg.grad_accumulate == 0:
+            if (iter_i + 1) % self.grad_accumulate == 0:
                 self.scaler.step(self.optimizer)
                 self.scaler.update()
                 self.optimizer.zero_grad()
@@ -281,7 +281,7 @@ class YoloTrainer(object):
                 # refine tgt
                 tgt_boxes_wh = boxes[..., 2:] - boxes[..., :2]
                 min_tgt_size = torch.min(tgt_boxes_wh, dim=-1)[0]
-                keep = (min_tgt_size >= 1)
+                keep = (min_tgt_size >= 8)
 
                 tgt["boxes"] = boxes[keep]
                 tgt["labels"] = labels[keep]
@@ -355,8 +355,8 @@ class RTDetrTrainer(object):
         self.scaler = torch.cuda.amp.GradScaler(enabled=args.fp16)
 
         # ---------------------------- Build Optimizer ----------------------------
-        cfg.grad_accumulate = max(16 // args.batch_size, 1)
-        cfg.base_lr = cfg.per_image_lr * args.batch_size * cfg.grad_accumulate
+        self.grad_accumulate = max(16 // args.batch_size, 1)
+        cfg.base_lr = cfg.per_image_lr * args.batch_size * self.grad_accumulate
         cfg.min_lr  = cfg.base_lr * cfg.min_lr_ratio
         self.optimizer, self.start_epoch = build_rtdetr_optimizer(cfg, model, args.resume)
 
@@ -366,7 +366,7 @@ class RTDetrTrainer(object):
 
         # ---------------------------- Build Model-EMA ----------------------------
         if self.model_ema is not None:
-            update_init = self.start_epoch * len(self.train_loader) // cfg.grad_accumulate
+            update_init = self.start_epoch * len(self.train_loader) // self.grad_accumulate
             print("Initialize ModelEMA's updates: {}".format(update_init))
             self.model_ema.updates = update_init            
 
@@ -496,7 +496,7 @@ class RTDetrTrainer(object):
                 outputs = model(images, targets)    
                 loss_dict = self.criterion(outputs, targets)
                 losses = sum(loss_dict.values())
-                losses /= self.cfg.grad_accumulate
+                losses /= self.grad_accumulate
                 loss_dict_reduced = distributed_utils.reduce_dict(loss_dict)
 
             # Backward
@@ -509,7 +509,7 @@ class RTDetrTrainer(object):
                 grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=self.cfg.clip_max_norm)
 
             # Optimize
-            if (iter_i + 1) % self.cfg.grad_accumulate == 0:
+            if (iter_i + 1) % self.grad_accumulate == 0:
                 self.scaler.step(self.optimizer)
                 self.scaler.update()
                 self.optimizer.zero_grad()
