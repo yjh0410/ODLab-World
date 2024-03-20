@@ -46,7 +46,6 @@ class YoloBaseConfig(object):
         self.head_act  = 'silu'
         self.head_norm = 'BN'
         self.head_depthwise = False
-        self.head_dim       = 256
         self.num_cls_head   = 2
         self.num_reg_head   = 2
 
@@ -61,13 +60,13 @@ class YoloBaseConfig(object):
 
         # ---------------- Assignment config ----------------
         ## Matcher
-        self.tal_topk_candidates = 13
-        self.tal_alpha = 1.0
+        self.tal_topk_candidates = 10
+        self.tal_alpha = 0.5
         self.tal_beta  = 6.0
         ## Loss weight
-        self.loss_cls = 1.0
-        self.loss_box = 2.5
-        self.loss_dfl = 0.5
+        self.loss_cls = 0.5
+        self.loss_box = 7.5
+        self.loss_dfl = 1.5
 
         # ---------------- ModelEMA config ----------------
         self.use_ema = True
@@ -89,7 +88,7 @@ class YoloBaseConfig(object):
         # ---------------- Lr Scheduler config ----------------
         self.warmup_epoch = 3
         self.lr_scheduler = "cosine"
-        self.max_epoch    = 300
+        self.max_epoch    = 500
         self.eval_epoch   = 10
         self.no_aug_epoch = 20
 
@@ -100,7 +99,7 @@ class YoloBaseConfig(object):
         self.mosaic_prob = 1.0
         self.mixup_prob  = 0.15
         self.copy_paste  = 0.0           # approximated by the YOLOX's mixup
-        self.multi_scale = [0.5, 1.25]   # multi scale: [img_size * 0.5, img_size * 1.25]
+        self.multi_scale = [0.5, 1.5]   # multi scale: [img_size * 0.5, img_size * 1.5]
         ## Pixel mean & std
         self.pixel_mean = [0., 0., 0.]
         self.pixel_std  = [255., 255., 255.]
@@ -110,7 +109,7 @@ class YoloBaseConfig(object):
         self.use_ablu = True
         self.affine_params = {
             'degrees': 0.0,
-            'translate': 0.1,
+            'translate': 0.2,
             'scale': [0.1, 2.0],
             'shear': 0.0,
             'perspective': 0.0,
