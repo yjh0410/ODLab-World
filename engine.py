@@ -356,7 +356,7 @@ class RTDetrTrainer(object):
         self.optimizer, self.start_epoch = build_rtdetr_optimizer(cfg, model, args.resume)
 
         # ---------------------------- Build LR Scheduler ----------------------------
-        self.wp_lr_scheduler = LinearWarmUpLrScheduler(cfg.base_lr, wp_iter=cfg.warmup_iters)
+        self.wp_lr_scheduler = LinearWarmUpLrScheduler(cfg.warmup_iters, cfg.base_lr)
         self.lr_scheduler    = build_lr_scheduler(cfg, self.optimizer, args.resume)
 
     def train(self, model):
