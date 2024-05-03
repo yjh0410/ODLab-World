@@ -217,12 +217,12 @@ class YoloTrainer(object):
             self.scaler.scale(losses).backward()
 
             # Gradient clip
-            if self.cfg.clip_max_norm > 0:
-                self.scaler.unscale_(self.optimizer)
-                torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=self.cfg.clip_max_norm)
 
             # Optimize
             if (iter_i + 1) % self.grad_accumulate == 0:
+                if self.cfg.clip_max_norm > 0:
+                    self.scaler.unscale_(self.optimizer)
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=self.cfg.clip_max_norm)
                 self.scaler.step(self.optimizer)
                 self.scaler.update()
                 self.optimizer.zero_grad()
@@ -441,6 +441,7 @@ class RTDetrTrainer(object):
         header = 'Epoch: [{} / {}]'.format(self.epoch, self.cfg.max_epoch)
         epoch_size = len(self.train_loader)
         print_freq = 10
+        grad_norm  = 0.0
 
         # basic parameters
         epoch_size = len(self.train_loader)
@@ -491,14 +492,11 @@ class RTDetrTrainer(object):
             # Backward
             self.scaler.scale(losses).backward()
 
-            # Gradient clip
-            grad_norm = None
-            if self.cfg.clip_max_norm > 0:
-                self.scaler.unscale_(self.optimizer)
-                grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=self.cfg.clip_max_norm)
-
             # Optimize
             if (iter_i + 1) % self.grad_accumulate == 0:
+                if self.cfg.clip_max_norm > 0:
+                    self.scaler.unscale_(self.optimizer)
+                    grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=self.cfg.clip_max_norm)
                 self.scaler.step(self.optimizer)
                 self.scaler.update()
                 self.optimizer.zero_grad()
