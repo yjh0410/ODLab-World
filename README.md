@@ -20,8 +20,7 @@ pip install -r requirements.txt
 2. (optional) Compile MSDeformableAttention ops for DETR series
 
 ```bash
-cd ./ppdet/modeling/transformers/ext_op/
-
+cd ./models/detectors/rtdetr/basic_modules/ext_op/
 python setup_ms_deformable_attn_op.py install
 ```
 See [details](./models/detectors/rtdetr/basic_modules/ext_op/)
